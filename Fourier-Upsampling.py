@@ -8,8 +8,6 @@ Date: 2022-3-6
 import os
 import torch
 import torch.nn as nn
-import torch.optim as optim
-from model.base_net import *
 from torchvision.transforms import *
 import torch.nn.functional as F
 
