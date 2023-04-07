@@ -37,6 +37,12 @@ It means to sum the results from both the spatial up-sampling and the proposed F
 It means to concatenate the results from both the spatial up-sampling and the proposed Fourier upsampling where slef.opspa and self.opfre are optional.
 
 
+## Mindspore Version
+
+We also provide the mindspore code at https://github.com/Dragoniss/mindspore-phase2-Deep-Fourier-Upsampling
+
+
 ## Contact
 
 If you have any problem with the released code, please do not hesitate to contact me by email (manman@mail.ustc.edu.cn).
+
