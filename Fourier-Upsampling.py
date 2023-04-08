@@ -166,17 +166,7 @@ class freup_Cornerdinterpolation(nn.Module):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+## the plug-and-play operator
 
 class fresadd(nn.Module):
     def __init__(self, channels=32):
