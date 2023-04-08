@@ -179,83 +179,52 @@ class freup_Cornerdinterpolation(nn.Module):
 
 
 class fresadd(nn.Module):
-    def __init__(self, in_channels=32, channels=32):
+    def __init__(self, channels=32):
         super(fresadd, self).__init__()
+        
+        self.Fup = freup_Areadinterpolation(channels)
 
-        self.opspa = ConvBlock(in_channels, channels, 5, 1, 2, activation=None, norm=None, bias = False)
-        self.opfre = freup_Periodicpadding(channels)
-
-        self.fuse1 = nn.Conv2d(channels, channels,1,1,0)
-        self.fuse2 = nn.Conv2d(channels, channels,1,1,0)
         self.fuse = nn.Conv2d(channels, channels,1,1,0)
 
     def forward(self,x):
 
         x1 = x
-        x2 = F.interpolate(x1,scale_factor=0.5,mode='bilinear')
-        x3 = F.interpolate(x1, scale_factor=0.25, mode='bilinear')
-
-        x1 = self.opspa(x1)
-        x2 = self.opspa(x2)
-        x3 = self.opspa(x3)
-
-        x3f = self.opfre(x3)
-        x3s = F.interpolate(x3, size=(x2.size()[2], x2.size()[3]), mode='bilinear')
-        x32 = self.fuse1(x3f + x3s)
-
-        x2m = x2 + x32
-
-        x2f = self.opfre(x2m)
-        x2s = F.interpolate(x2m,size=(x1.size()[2],x1.size()[3]),mode='bilinear')
-        x21 = self.fuse2(x2f + x2s)
-
-        x1m = x1 + x21
-        x = self.fuse(x1m)
-
-        return x
+        
+        x2 = F.interpolate(x1,scale_factor=2,mode='bilinear')
+      
+        x3 = self.Fup(x1)
+     
 
 
+        xm = x2 + x3
+        xn = self.fuse(xm)
 
-
-
-
+        return xn
 
 
 
 
 class frescat(nn.Module):
-    def __init__(self, in_channels=32, channels=32):
-        super(frescat, self).__init__()
+    def __init__(self, channels=32):
+        super(fresadd, self).__init__()
+        
+        self.Fup = freup_Areadinterpolation(channels)
 
-
-        self.opspa = ConvBlock(in_channels, channels, 5, 1, 2, activation=None, norm=None, bias = False)
-        self.opfre = freup_Periodicpadding(channels)
-
-        self.fuse1 = nn.Conv2d(2*channels, channels,1,1,0)
-        self.fuse2 = nn.Conv2d(2*channels, channels,1,1,0)
         self.fuse = nn.Conv2d(2*channels, channels,1,1,0)
 
     def forward(self,x):
 
         x1 = x
-        x2 = F.interpolate(x1,scale_factor=0.5,mode='bilinear')
-        x3 = F.interpolate(x1, scale_factor=0.25, mode='bilinear')
+        
+        x2 = F.interpolate(x1,scale_factor=2,mode='bilinear')
+      
+        x3 = self.Fup(x1)
+        
+        xn = self.fuse(torch.cat([x2,x3],dim=1))
+     
+      
+        return xn
 
-        x1 = self.opspa(x1)
-        x2 = self.opspa(x2)
-        x3 = self.opspa(x3)
 
-        x3f = self.opfre(x3)
-        x3s = F.interpolate(x3, size=(x2.size()[2], x2.size()[3]), mode='bilinear')
-        x32 = self.fuse1(torch.cat([x3f,x3s],dim=1))
 
-        x2m = x2 + x32
 
-        x2f = self.opfre(x2m)
-        x2s = F.interpolate(x2m,size=(x1.size()[2],x1.size()[3]),mode='bilinear')
-        x21 = self.fuse2(torch.cat([x2f,x2s],dim=1))
-
-        # x1m = x1 + x21
-        x = self.fuse(torch.cat([x1,x21],dim=1))
-
-        return x
