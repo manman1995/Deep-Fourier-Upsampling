@@ -196,7 +196,7 @@ class fresadd(nn.Module):
 
 class frescat(nn.Module):
     def __init__(self, channels=32):
-        super(fresadd, self).__init__()
+        super(frescat, self).__init__()
         
         self.Fup = freup_Areadinterpolation(channels)
 
