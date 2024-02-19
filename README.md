@@ -8,16 +8,19 @@ This repository is the **official implementation** of the paper, "Deep Fourier U
 
 It corresponds to the implementaion of the Area Interpolation Variant of Deep Fourier Up-sampling
 
+### 1. class freup_AreadinterpolationV2()
+
+It corresponds to the implementaion of the Area Interpolation Variant v2 of Deep Fourier Up-sampling
 
 
-### 1. class freup_Periodicpadding()
+### 2. class freup_Periodicpadding()
 
 It corresponds to the implementaion of the Periodic padding Variant of Deep Fourier Up-sampling
 
 
 
 
-### 2. class freup_Cornerdinterpolation()
+### 3. class freup_Cornerdinterpolation()
 
 It corresponds to the implementaion of the Corner Interpolation Variant of Deep Fourier Up-sampling
 
