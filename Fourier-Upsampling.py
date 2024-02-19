@@ -10,7 +10,30 @@ import torch
 import torch.nn as nn
 from torchvision.transforms import *
 import torch.nn.functional as F
+def calculate_d(x, y, M, N):
+    term1 = 1
+    term2 = torch.exp(1j * torch.tensor(np.pi) * x / M)
+    term3 = torch.exp(1j * torch.tensor(np.pi) * y / N)
+    term4 = torch.exp(1j * torch.tensor(np.pi) * (x/M + y/N))
 
+    result = term1 + term2 + term3 + term4
+    return torch.abs(result) / 4
+
+def get_D_map(feature):
+    B, C, H, W = feature.shape
+    out = torch.zeros((1, 1, 2*H, 2*W), dtype=torch.float32)
+
+    for i in range(2*H):
+        for j in range(2*W):
+            if i < H and j < W:
+                out[:, :, i, j] = calculate_d(i, j, H, W)
+            elif i >= H and j < W:
+                out[:, :, i, j] = calculate_d(2*H - i, j, H, W)
+            elif i < H and j >= W:
+                out[:, :, i, j] = calculate_d(i, 2*W - j, H, W)
+            else:
+                out[:, :, i, j] = calculate_d(2*H - i, 2*W - j, H, W)
+    return out
 
 class freup_Areadinterpolation(nn.Module):
     def __init__(self, channels):
@@ -52,6 +75,46 @@ class freup_Areadinterpolation(nn.Module):
 
         return self.post(crop)
 
+class freup_AreadinterpolationV2(nn.Module):
+    def __init__(self, channels):
+        super(freup_AreadinterpolationV2, self).__init__()
+
+        self.amp_fuse = nn.Sequential(nn.Conv2d(channels,channels,1,1,0),nn.LeakyReLU(0.1,inplace=False),
+                                      nn.Conv2d(channels,channels,1,1,0))
+        self.pha_fuse = nn.Sequential(nn.Conv2d(channels,channels,1,1,0),nn.LeakyReLU(0.1,inplace=False),
+                                      nn.Conv2d(channels,channels,1,1,0))
+
+        self.post = nn.Conv2d(channels,channels,1,1,0)
+
+    def forward(self, x):
+        N, C, H, W = x.shape
+
+        fft_x = torch.fft.fft2(x)
+        mag_x = torch.abs(fft_x)
+        pha_x = torch.angle(fft_x)
+
+        Mag = self.amp_fuse(mag_x)
+        Pha = self.pha_fuse(pha_x)
+        
+        amp_fuse = Mag.repeat_interleave(2, dim=2).repeat_interleave(2, dim=3)
+        pha_fuse = Pha.repeat_interleave(2, dim=2).repeat_interleave(2, dim=3)
+
+        real = amp_fuse * torch.cos(pha_fuse)
+        imag = amp_fuse * torch.sin(pha_fuse)
+        out = torch.complex(real, imag)
+        
+        output = torch.fft.ifft2(out)
+        output = torch.abs(output)
+        d_map= get_D_map(x)
+        output = output / d_map
+        crop = torch.zeros_like(x)
+        crop[:, :, 0:int(H/2), 0:int(W/2)] = output[:, :, 0:int(H/2), 0:int(W/2)]
+        crop[:, :, int(H/2):H, 0:int(W/2)] = output[:, :, int(H*1.5):2*H, 0:int(W/2)]
+        crop[:, :, 0:int(H/2), int(W/2):W] = output[:, :, 0:int(H/2), int(W*1.5):2*W]
+        crop[:, :, int(H/2):H, int(W/2):W] = output[:, :, int(H*1.5):2*H, int(W*1.5):2*W]
+        crop = F.interpolate(crop, (2*H, 2*W))
+
+        return self.post(crop)
 
 class freup_Periodicpadding(nn.Module):
     def __init__(self, channels):
