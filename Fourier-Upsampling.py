@@ -12,9 +12,9 @@ from torchvision.transforms import *
 import torch.nn.functional as F
 def calculate_d(x, y, M, N):
     term1 = 1
-    term2 = torch.exp(1j * torch.tensor(np.pi) * x / M)
-    term3 = torch.exp(1j * torch.tensor(np.pi) * y / N)
-    term4 = torch.exp(1j * torch.tensor(np.pi) * (x/M + y/N))
+    term2 = torch.exp(1j * torch.tensor(np.pi) * x / M).cuda()
+    term3 = torch.exp(1j * torch.tensor(np.pi) * y / N).cuda()
+    term4 = torch.exp(1j * torch.tensor(np.pi) * (x/M + y/N)).cuda()
 
     result = term1 + term2 + term3 + term4
     return torch.abs(result) / 4
@@ -37,11 +37,11 @@ def calculate_d(x, y, M, N):
 
 def get_D_map_optimized(feature):
     B, C, H, W = feature.shape
-    d_map = torch.zeros((1, 1, H, W), dtype=torch.float32)
+    d_map = torch.zeros((1, 1, H, W), dtype=torch.float32).cuda()
     
     #Create a grid to store the indices of all (i, j) pairs
-    i_indices = torch.arange(H, dtype=torch.float32).reshape(1, 1, H, 1).repeat(1, 1, 1, W)
-    j_indices = torch.arange(W, dtype=torch.float32).reshape(1, 1, 1, W).repeat(1, 1, H, 1)
+    i_indices = torch.arange(H, dtype=torch.float32).reshape(1, 1, H, 1).repeat(1, 1, 1, W).cuda()
+    j_indices = torch.arange(W, dtype=torch.float32).reshape(1, 1, 1, W).repeat(1, 1, H, 1).cuda()
     
     # Compute d_map using vectorization operations
     d_map[:, :, :, :] = calculate_d(i_indices, j_indices, H, W)
