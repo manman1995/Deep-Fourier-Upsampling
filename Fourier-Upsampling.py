@@ -39,11 +39,11 @@ def get_D_map_optimized(feature):
     B, C, H, W = feature.shape
     d_map = torch.zeros((1, 1, H, W), dtype=torch.float32)
     
-    # 创建一个网格来存储所有(i, j)对的索引
+    #Create a grid to store the indices of all (i, j) pairs
     i_indices = torch.arange(H, dtype=torch.float32).reshape(1, 1, H, 1).repeat(1, 1, 1, W)
     j_indices = torch.arange(W, dtype=torch.float32).reshape(1, 1, 1, W).repeat(1, 1, H, 1)
     
-    # 使用矢量化操作计算d_map
+    # Compute d_map using vectorization operations
     d_map[:, :, :, :] = calculate_d(i_indices, j_indices, H, W)
     
     return d_map
