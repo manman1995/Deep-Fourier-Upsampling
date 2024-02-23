@@ -19,21 +19,35 @@ def calculate_d(x, y, M, N):
     result = term1 + term2 + term3 + term4
     return torch.abs(result) / 4
 
-def get_D_map(feature):
-    B, C, H, W = feature.shape
-    out = torch.zeros((1, 1, 2*H, 2*W), dtype=torch.float32)
+# def get_D_map(feature):
+#     B, C, H, W = feature.shape
+#     out = torch.zeros((1, 1, 2*H, 2*W), dtype=torch.float32)
 
-    for i in range(2*H):
-        for j in range(2*W):
-            if i < H and j < W:
-                out[:, :, i, j] = calculate_d(i, j, H, W)
-            elif i >= H and j < W:
-                out[:, :, i, j] = calculate_d(2*H - i, j, H, W)
-            elif i < H and j >= W:
-                out[:, :, i, j] = calculate_d(i, 2*W - j, H, W)
-            else:
-                out[:, :, i, j] = calculate_d(2*H - i, 2*W - j, H, W)
-    return out
+#     for i in range(2*H):
+#         for j in range(2*W):
+#             if i < H and j < W:
+#                 out[:, :, i, j] = calculate_d(i, j, H, W)
+#             elif i >= H and j < W:
+#                 out[:, :, i, j] = calculate_d(2*H - i, j, H, W)
+#             elif i < H and j >= W:
+#                 out[:, :, i, j] = calculate_d(i, 2*W - j, H, W)
+#             else:
+#                 out[:, :, i, j] = calculate_d(2*H - i, 2*W - j, H, W)
+#     return out
+
+def get_D_map_optimized(feature):
+    B, C, H, W = feature.shape
+    d_map = torch.zeros((1, 1, H, W), dtype=torch.float32)
+    
+    # 创建一个网格来存储所有(i, j)对的索引
+    i_indices = torch.arange(H, dtype=torch.float32).reshape(1, 1, H, 1).repeat(1, 1, 1, W)
+    j_indices = torch.arange(W, dtype=torch.float32).reshape(1, 1, 1, W).repeat(1, 1, H, 1)
+    
+    # 使用矢量化操作计算d_map
+    d_map[:, :, :, :] = calculate_d(i_indices, j_indices, H, W)
+    
+    return d_map
+
 
 class freup_Areadinterpolation(nn.Module):
     def __init__(self, channels):
@@ -105,13 +119,11 @@ class freup_AreadinterpolationV2(nn.Module):
         
         output = torch.fft.ifft2(out)
         output = torch.abs(output)
-        d_map= get_D_map(x)
-        output = output / d_map
+        d_map= get_D_map_optimized(x)
         crop = torch.zeros_like(x)
-        crop[:, :, 0:int(H/2), 0:int(W/2)] = output[:, :, 0:int(H/2), 0:int(W/2)]
-        crop[:, :, int(H/2):H, 0:int(W/2)] = output[:, :, int(H*1.5):2*H, 0:int(W/2)]
-        crop[:, :, 0:int(H/2), int(W/2):W] = output[:, :, 0:int(H/2), int(W*1.5):2*W]
-        crop[:, :, int(H/2):H, int(W/2):W] = output[:, :, int(H*1.5):2*H, int(W*1.5):2*W]
+        crop[:,:,:,:] = output[:,:,:H,:W]
+        d_map= get_D_map_optimized(x)
+        crop = crop / d_map
         crop = F.interpolate(crop, (2*H, 2*W))
 
         return self.post(crop)
