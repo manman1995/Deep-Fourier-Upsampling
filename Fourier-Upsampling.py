@@ -233,10 +233,37 @@ class freup_Cornerdinterpolation(nn.Module):
         return output
 
 
+class freup_Cornerdinterpolation_v2(nn.Module):
+    def __init__(self, channels):
+        super(freup_Cornerdinterpolation_v2, self).__init__()
 
+        self.amp_fuse = nn.Sequential(nn.Conv2d(channels, channels, 1, 1, 0), nn.LeakyReLU(0.1, inplace=False),
+                                      nn.Conv2d(channels, channels, 1, 1, 0))
+        self.pha_fuse = nn.Sequential(nn.Conv2d(channels, channels, 1, 1, 0), nn.LeakyReLU(0.1, inplace=False),
+                                      nn.Conv2d(channels, channels, 1, 1, 0))
+    def forward(self, x):
+        N, C, H, W = x.shape
 
+        fft_x = torch.fft.fft2(x)  # n c h w
+        fft_x = torch.fft.fftshift(fft_x)
+        mag_x = torch.abs(fft_x)
+        pha_x = torch.angle(fft_x)
 
+        Mag = self.amp_fuse(mag_x)
+        Pha = self.pha_fuse(pha_x)
 
+        Mag = torch.nn.functional.pad(Mag, (W // 2, W // 2, H // 2, H // 2))
+        Pha = torch.nn.functional.pad(Pha, (W // 2, W // 2, H // 2, H // 2))
+
+        real = Mag * torch.cos(Pha)
+        imag = Mag * torch.sin(Pha)
+        out = torch.complex(real, imag)
+
+        out = torch.fft.ifftshift(out)
+        output = torch.fft.ifft2(out)
+        output = torch.abs(output)
+
+        return output
 
 
 
