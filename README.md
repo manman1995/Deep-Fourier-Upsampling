@@ -26,19 +26,6 @@ It corresponds to the implementaion of the Corner Interpolation Variant of Deep 
 
 
 
-## the recommended plug-and-play upsampling operator
-
-
-### 0. class fresadd()
-
-It means to sum the results from both the spatial up-sampling and the proposed Fourier upsampling.
-
-
-
-### 1. class frescat()
-
-It means to concatenate the results from both the spatial up-sampling and the proposed Fourier upsampling.
-
 
 ## Mindspore Version
 
