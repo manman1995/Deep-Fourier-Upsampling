@@ -1,7 +1,7 @@
-output_dir: '/home/yuwei/experiment/upsample/aod_4'
+output_dir: 'experiment/upsample/aod_4'
 data:
-  train_dir: /home/data/yuwei/data/ITS/
-  test_dir: /home/data/yuwei/data/SOTS/indoor
+  train_dir: data/ITS/
+  test_dir: data/SOTS/indoor
 
 model:
   in_channel: 3

@@ -258,6 +258,6 @@ def main(args):
 
 
 if __name__ == '__main__':
-    parser = read_args("/home/yuwei/code/upsampling/aodnet/config/config.yaml")
+    parser = read_args("config/config.yaml")
     args = parser.parse_args()
     main(args)
