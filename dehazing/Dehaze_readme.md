@@ -13,7 +13,7 @@ python AODNet/train.py
 
 ```
 #### : AODNet Inference
-
+Please refer to [Google drive](https://drive.google.com/drive/folders/1zayArqjtukQu9HmtkWQlGzynRNRi-idt?usp=sharing) for data download. 
 Set the path of the pretrained model in  Line110.
 Set upsampling version in Line 354-358 in AODNet/model/final_model.py
 ```
@@ -31,6 +31,7 @@ python train.py --dataset path_to_dataset/RESIDE_HDF5_all/ --lr 1e-4 --batchSize
 
 ```
 #### : MSBDN Inference
+Please refer to [Google drive](https://drive.google.com/drive/folders/1zayArqjtukQu9HmtkWQlGzynRNRi-idt?usp=sharing) for data download. 
 ```
 cd MSBDN
 python test.py --checkpoint path_to_pretrained_model
