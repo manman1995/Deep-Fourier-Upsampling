@@ -31,6 +31,7 @@ python train.py --dataset path_to_dataset/RESIDE_HDF5_all/ --lr 1e-4 --batchSize
 
 ```
 #### : MSBDN Inference
+Please refer to [Google drive]([https://github.com/BookerDeWitt/MSBDN-DFF](https://drive.google.com/drive/folders/1zayArqjtukQu9HmtkWQlGzynRNRi-idt?usp=sharing)) for data download. 
 ```
 cd MSBDN
 python test.py --checkpoint path_to_pretrained_model
