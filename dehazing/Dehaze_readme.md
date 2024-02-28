@@ -23,7 +23,9 @@ python AODNet/test.py
 
 #### : MSBDN Training
 
- Please refer to MSBDN(https://github.com/BookerDeWitt/MSBDN-DFF) for data download. 
+Please refer to MSBDN(https://github.com/BookerDeWitt/MSBDN-DFF) for data and pre-trained model download. 
+Please download the pre-trained MSBDN model to /Deep-Fourier-Upsampling/dehazing/MSBDN/
+Since it is difficult to train MSBDN directly to achieve the performance reported in its paper, in order to reproduce the original results of MSBDN, we use the pre-training file given in MSBDN for initialization and retrain.
 Set upsampling version in Line 321-324 in MSBDN\networks\MSBDN-DFF-v1-1.py
 ```
 cd MSBDN
@@ -31,7 +33,7 @@ python train.py --dataset path_to_dataset/RESIDE_HDF5_all/ --lr 1e-4 --batchSize
 
 ```
 #### : MSBDN Inference
-Please refer to [Google drive](https://drive.google.com/drive/folders/1zayArqjtukQu9HmtkWQlGzynRNRi-idt?usp=sharing) for data download. 
+Please refer to [Google drive](https://drive.google.com/drive/folders/1zayArqjtukQu9HmtkWQlGzynRNRi-idt?usp=sharing) for pre-trained download. 
 ```
 cd MSBDN
 python test.py --checkpoint path_to_pretrained_model
