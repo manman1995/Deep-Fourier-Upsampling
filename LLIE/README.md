@@ -1,7 +1,8 @@
 ## Applications
 ###  Low-Light Image Enhancement
 ####  Prepare data
-Download the training data and add the data path to the config file (/basicsr/option/train/LLIE/*.yml). Please refer to [LOL](https://daooshee.github.io/BMVC2018website/) and [Huawei](https://github.com/JianghaiSCU/R2RNet) for data download. 
+Download the training data and add the data path to the config file (/basicsr/option/train/LLIE/*.yml). Please refer to [LOL](https://daooshee.github.io/BMVC2018website/) and [Huawei](it 
+includes 2480 images, and we we randomly select 2200 images for training and the remaining 280 for testing, realsed in https://github.com/JianghaiSCU/R2RNet) for data download. 
 #### : Training
 ```
 python /LLIE/train.py -opt /LLIE/options/train/LLIE/SID_UpSampling_Padding.yml
