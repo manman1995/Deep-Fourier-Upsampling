@@ -1,5 +1,5 @@
 ## Applications
-### : Low-Light Image Enhancement
+### : De-raining
 #### : Prepare data
 Download the training data and add the data path to the config file ( /data/derain_nips/options/train/*/Z_PRENet.yml，*dataset). Please refer to [RAIN200H] and [RAIN200L] for data download. 
 #### : Training
