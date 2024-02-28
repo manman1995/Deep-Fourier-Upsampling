@@ -21,7 +21,7 @@ parser.add_argument("--start_training_step", type=int, default=1, help="Training
 parser.add_argument("--step", type=int, default=7, help="Change the learning rate for every 30 epochs")
 parser.add_argument("--start-epoch", type=int, default=1, help="Start epoch from 1")
 parser.add_argument("--lr_decay", type=float, default=0.5, help="Decay scale of learning rate, default=0.5")
-parser.add_argument("--resume", default="", type=str, help="Path to checkpoint (default: none)")
+parser.add_argument("--resume", default="/Deep-Fourier-Upsampling/dehazing/MSBDN/model.pkl", type=str, help="Path to checkpoint (default: none)")
 parser.add_argument("--isTest", type=bool, default=False, help="Test or not")
 parser.add_argument('--dataset', default="/data/Datasets/RESIDE/RESIDE_HDF5_all/", type=str, help='Path of the training dataset(.h5)')
 parser.add_argument('--model', default='MSBDN-DFF', type=str, help='Import which network')
