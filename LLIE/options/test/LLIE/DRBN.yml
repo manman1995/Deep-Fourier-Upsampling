@@ -18,8 +18,7 @@ datasets:
 network_g:
   type: DRBN_UpSampling_Area
   n_color: 3
-  gc: 3
-  shiftPixel: 1
+
 
 #### path
 path:
