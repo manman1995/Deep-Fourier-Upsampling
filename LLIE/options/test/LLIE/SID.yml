@@ -17,8 +17,7 @@ datasets:
 #### network structures
 network_g:
     type: SID_UpSampling_Area
-    shiftPixel: 2
-    gc: 8
+
 
 #### path
 path:
