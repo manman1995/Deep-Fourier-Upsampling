@@ -17,5 +17,5 @@ python /LLIE/train.py -opt /LLIE/options/train/LLIE/DRBN_UpSampling_Corner.yml
 Download the pretrained low-light image enhancement model from [Google Drive](https://drive.google.com/drive/folders/1zayArqjtukQu9HmtkWQlGzynRNRi-idt?usp=sharing
 ) and add the path to the config file (/LLIE/options/test/LLIE/*.yml).
 ```
-python /LLIE/train.py -opt /LLIE/options/train/LLIE/SID.yml
-python /LLIE/train.py -opt /LLIE/options/train/LLIE/DRBN.yml
+python /LLIE/test.py -opt /LLIE/options/train/LLIE/SID.yml
+python /LLIE/test.py -opt /LLIE/options/train/LLIE/DRBN.yml
