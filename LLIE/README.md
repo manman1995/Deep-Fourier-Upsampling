@@ -16,6 +16,8 @@ python /LLIE/train.py -opt /LLIE/options/train/LLIE/DRBN_UpSampling_Corner.yml
 #### : Inference
 Download the pretrained low-light image enhancement model from [Google Drive](https://drive.google.com/drive/folders/1zayArqjtukQu9HmtkWQlGzynRNRi-idt?usp=sharing
 ) and add the path to the config file (/LLIE/options/test/LLIE/*.yml).
+
+For evaluating SID or DRBN models with different up-sampling operations, please update the network_g->type (SID_UpSamlping_Area(AreaV2 / Corner / Padding) and DRBN_UpSamlping_Area(AreaV2 / Corner / Padding)) and the corrsponding pre-trained path (path->pretrain_network_g) in the configuration files /LLIE/options/test/LLIE/*.yml.
 ```
 python /LLIE/test.py -opt /LLIE/options/test/LLIE/SID.yml
 python /LLIE/test.py -opt /LLIE/options/test/LLIE/DRBN.yml
