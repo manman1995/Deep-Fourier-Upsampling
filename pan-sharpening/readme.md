@@ -1,5 +1,5 @@
 # Pan-Sharpening Algorithm
-This repository contains an implementation of pan-sharpening algorithm. The algorithm is specified in the provided YAML configuration file (config.yaml). Users are required to configure specific parameters before running the code.
+This repository contains an implementation of pan-sharpening algorithm. The algorithm is specified in the provided YAML configuration file (option.yaml/option_pannet.yaml). Users are required to configure specific parameters before running the code.
 # Configuration
 Before using the code, make sure to configure the following parameters in the config.yaml file:
 
@@ -20,6 +20,13 @@ For inference, after configuring the parameters, run the following commands:
 
 `
 python test.py
+`
+or 
+`
+python test_pannet.py
+`
+then
+`
 python py-tra/demo_deep_methods.py
 `
 
@@ -28,4 +35,8 @@ Training
 For training, modify the necessary parameters in the config.yaml file, then run:
 
 `python main.py
+`
+or
+`
+python main_pannet.py
 `
