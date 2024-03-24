@@ -153,7 +153,7 @@ class Solver(BaseSolver):
         # self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer,500,0.5,last_epoch=-1) #torch.optim.lr_scheduler.CosineAnnealingLR(self.optimizer,20,0)
         #self.vggloss = make_loss('VGG54')
         #self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, 500, 0.1,last_epoch=-1)
-        self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optimizer,500,5e-8)
+        self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer,200,0.5,last_epoch=-1) 
         # self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optimizer, 20, 0)
         # self.scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(self.optimizer,500,1,5e-8)
         self.log_name = self.cfg['algorithm'] + '_' + str(self.cfg['data']['upsacle']) + '_' + str(self.timestamp)
