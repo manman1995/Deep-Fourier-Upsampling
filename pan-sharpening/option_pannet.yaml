@@ -1,0 +1,63 @@
+#
+# @Author: wjm
+# @Date: 2019-10-13 21:45:10
+# @LastEditTime: 2019-10-13 21:46:06
+# @Description: file content
+# 
+
+name: Net
+algorithm: pannet_fcat_fouriercorner.py #maunetv4_ns #ugcn_s4nba0  pan_unfolding_v4
+nEpochs: 1000
+gpu_mode: True
+save_best: True
+gpus: [0]
+threads:  4 #num_works
+log_dir: pan-sharpening/log/
+
+
+seed: 123 #123
+checkpoint: pan-sharpening/checkpoint
+data_dir_train: pan-sharpening/yaogan/WV2_data/train128
+data_dir_eval: pan-sharpening/yaogan/WV2_data/test128
+
+source_ms: ms
+source_pan: pan
+
+pretrain:
+  pretrained: False
+  pre_sr: /checkpoint/pretrained/xxx.pth 
+  pre_folder: pan-sharpening/checkpoint/
+
+test:  #用于指标测试的代码
+  algorithm: pannnet #pannetffft
+  type: test #[test, eval]
+  data_dir: pan-sharpening/yaogan/WV2_data/test128
+  source_ms: ms
+  source_pan: pan 
+  model: xxx.pth
+  #model: ugcn_s4nb_4_1630368984/best.pth
+  save_dir: pan-sharpening/result/result_wv2/
+
+data:
+  upsacle:  4
+  batch_size: 4 #4
+  patch_size: 32
+  data_augmentation: False
+  n_colors: 4
+  rgb_range: 255
+  normalize : False
+  
+schedule:
+  lr: 5e-5 #5e-6 #1e-2
+  decay: 500
+  gamma: 0.1
+  optimizer: ADAM #[ADAM, SGD, RMSprop]
+  momentum: 0.9 #SGD momentum
+  beta1: 0.9 #ADAM beta1
+  beta2: 0.999 #ADAM beta
+  epsilon: 1e-8 #ADAM epsilon
+  alpha: 0.9 #RMSprop alpha
+  weight_dency: 0
+  gclip: 4 #0.4   #0.4  0.04
+  loss: L1
+  use_YCbCr: False
