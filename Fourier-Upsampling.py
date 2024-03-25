@@ -172,7 +172,7 @@ class freup_Cornerdinterpolation(nn.Module):
         self.pha_fuse = nn.Sequential(nn.Conv2d(channels, channels, 1, 1, 0), nn.LeakyReLU(0.1, inplace=False),
                                       nn.Conv2d(channels, channels, 1, 1, 0))
 
-        # self.post = nn.Conv2d(channels,channels,1,1,0)
+        self.post = nn.Conv2d(channels,channels,1,1,0)
 
     def forward(self, x):
         N, C, H, W = x.shape
@@ -230,7 +230,7 @@ class freup_Cornerdinterpolation(nn.Module):
         output = torch.fft.ifft2(out)
         output = torch.abs(output)
 
-        return output
+        return self.post(output)
 
 
 class freup_Cornerdinterpolation_v2(nn.Module):
@@ -241,6 +241,8 @@ class freup_Cornerdinterpolation_v2(nn.Module):
                                       nn.Conv2d(channels, channels, 1, 1, 0))
         self.pha_fuse = nn.Sequential(nn.Conv2d(channels, channels, 1, 1, 0), nn.LeakyReLU(0.1, inplace=False),
                                       nn.Conv2d(channels, channels, 1, 1, 0))
+        self.post = nn.Conv2d(channels,channels,1,1,0)
+
     def forward(self, x):
         N, C, H, W = x.shape
 
@@ -261,7 +263,7 @@ class freup_Cornerdinterpolation_v2(nn.Module):
 
         out = torch.fft.ifftshift(out)
         output = torch.fft.ifft2(out)
-        output = torch.abs(output)
+        output = self.post(torch.abs(output))
 
         return output
 
