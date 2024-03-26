@@ -330,6 +330,7 @@ class UpsampleConvLayer(torch.nn.Module):
         B,C,H,W = o1.shape
         o1 = F.interpolate(o1, size=[H+1, W+1], mode='bilinear', align_corners=False)
         out = self.conv2d(x) + o1
+        out = self.conv2d(x)
         return out
 
 
