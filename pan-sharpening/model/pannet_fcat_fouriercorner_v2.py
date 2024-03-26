@@ -23,7 +23,6 @@ class freup_Cornerdinterpolation(nn.Module):
                                       nn.Conv2d(channels, channels, 1, 1, 0))
         self.pha_fuse = nn.Sequential(nn.Conv2d(channels, channels, 1, 1, 0), nn.LeakyReLU(0.1, inplace=False),
                                       nn.Conv2d(channels, channels, 1, 1, 0))
-        self.post = nn.Conv2d(channels,channels,1,1,0)
 
     def forward(self, x):
         N, C, H, W = x.shape
