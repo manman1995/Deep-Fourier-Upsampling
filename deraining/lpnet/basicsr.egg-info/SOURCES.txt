@@ -38,6 +38,7 @@ basicsr/models/archs/__init__.py
 basicsr/models/archs/arch_util.py
 basicsr/models/archs/common.py
 basicsr/models/archs/layers.py
+basicsr/models/archs/lpnet_arch.py
 basicsr/models/losses/__init__.py
 basicsr/models/losses/loss_util.py
 basicsr/models/losses/losses.py

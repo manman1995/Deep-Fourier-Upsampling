@@ -26,10 +26,9 @@ network_g:
   type: LPNet_corner
 
 
-
 # path
 path:
-  pretrain_network_g: deraincode_release/checkpoint/rain200l/lpnet_corner.pth
+  pretrain_network_g: derain_checkpoint\checkpoint\rain200h\lpnet_corner.pth
   strict_load_g: true
   resume_state: ~
 
