@@ -16,8 +16,8 @@ datasets:
   test:
     name: RAIN200L
     type: PairedImageDataset
-    dataroot_gt: ~
-    dataroot_lq: ~
+    dataroot_gt: Rain100L
+    dataroot_lq: Rain100L\rainy
     io_backend:
       type: disk
 

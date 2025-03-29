@@ -16,8 +16,8 @@ datasets:
   train:
     name: RAIN200H
     type: PairedImageDataset
-    dataroot_gt: C:\Users\marka\Desktop\Rain100H\Rain100H
-    dataroot_lq: C:\Users\marka\Desktop\Rain100H\Rain100H\rainy
+    dataroot_gt: Rain100H
+    dataroot_lq: Rain100H\rainy
 
     filename_tmpl: '{}'
     io_backend:
@@ -37,8 +37,8 @@ datasets:
   val:
     name: RAIN200H
     type: PairedImageDataset
-    dataroot_gt: C:\Users\marka\Desktop\Rain100H\Rain100H
-    dataroot_lq: C:\Users\marka\Desktop\Rain100H\Rain100H\rainy
+    dataroot_gt: Rain100H
+    dataroot_lq: Rain100H\rainy
     io_backend:
       type: disk
 
