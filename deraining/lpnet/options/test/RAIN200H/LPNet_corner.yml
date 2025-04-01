@@ -16,8 +16,8 @@ datasets:
   test:
     name: RAIN200L
     type: PairedImageDataset
-    dataroot_gt: C:\Users\marka\Desktop\Deep-Fourier-Upsampling\Rain100H\norain
-    dataroot_lq: C:\Users\marka\Desktop\Deep-Fourier-Upsampling\Rain100H\rainy
+    dataroot_gt: /home/yiweigui/Deep-Fourier-Upsampling/Rain100H/norain
+    dataroot_lq: /home/yiweigui/Deep-Fourier-Upsampling/Rain100H/rainy
     io_backend:
       type: disk
 
@@ -28,7 +28,7 @@ network_g:
 
 # path
 path:
-  pretrain_network_g: C:\Users\marka\Desktop\Deep-Fourier-Upsampling\derain_checkpoint\checkpoint\rain200h\lpnet_corner.pth
+  pretrain_network_g: /home/yiweigui/Deep-Fourier-Upsampling/derain_checkpoint/checkpoint/rain200h/lpnet_corner.pth
   strict_load_g: true
   resume_state: ~
 

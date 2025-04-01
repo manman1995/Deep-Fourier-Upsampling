@@ -1,0 +1,78 @@
+2025-04-01 19:20:37,041 INFO: 
+                ____                _       _____  ____
+               / __ ) ____ _ _____ (_)_____/ ___/ / __ \
+              / __  |/ __ `// ___// // ___/\__ \ / /_/ /
+             / /_/ // /_/ /(__  )/ // /__ ___/ // _, _/
+            /_____/ \__,_//____//_/ \___//____//_/ |_|
+     ______                   __   __                 __      __
+    / ____/____   ____   ____/ /  / /   __  __ _____ / /__   / /
+   / / __ / __ \ / __ \ / __  /  / /   / / / // ___// //_/  / /
+  / /_/ // /_/ // /_/ // /_/ /  / /___/ /_/ // /__ / /<    /_/
+  \____/ \____/ \____/ \____/  /_____/\____/ \___//_/|_|  (_)
+    
+Version Information: 
+	PyTorch: 2.0.1+cu117
+	TorchVision: 0.15.2+cu117
+2025-04-01 19:20:37,042 INFO: 
+  name: RAIN200L-LPNet_corner
+  model_type: LPNetModel
+  scale: 1
+  num_gpu: 1
+  manual_seed: 10
+  datasets:[
+    test:[
+      name: RAIN200L
+      type: PairedImageDataset
+      dataroot_gt: /home/yiweigui/Deep-Fourier-Upsampling/Rain100H/norain
+      dataroot_lq: /home/yiweigui/Deep-Fourier-Upsampling/Rain100H/rainy
+      io_backend:[
+        type: disk
+      ]
+      phase: test
+      scale: 1
+    ]
+  ]
+  network_g:[
+    type: LPNet_corner
+  ]
+  path:[
+    pretrain_network_g: /home/yiweigui/Deep-Fourier-Upsampling/derain_checkpoint/checkpoint/rain200h/lpnet_corner.pth
+    strict_load_g: True
+    resume_state: None
+    root: /home/yiweigui/Deep-Fourier-Upsampling/deraining/lpnet
+    results_root: /home/yiweigui/Deep-Fourier-Upsampling/deraining/lpnet/results/RAIN200L-LPNet_corner
+    log: /home/yiweigui/Deep-Fourier-Upsampling/deraining/lpnet/results/RAIN200L-LPNet_corner
+    visualization: /home/yiweigui/Deep-Fourier-Upsampling/deraining/lpnet/results/RAIN200L-LPNet_corner/visualization
+  ]
+  val:[
+    save_img: False
+    grids: False
+    crop_size: 256
+    metrics:[
+      psnr:[
+        type: calculate_psnr
+        crop_border: 0
+        test_y_channel: True
+      ]
+      ssim:[
+        type: calculate_ssim
+        crop_border: 0
+        test_y_channel: True
+      ]
+    ]
+  ]
+  dist_params:[
+    backend: nccl
+    port: 29500
+  ]
+  is_train: False
+  dist: False
+  rank: 0
+  world_size: 1
+
+2025-04-01 19:20:37,055 INFO: Dataset PairedImageDataset - RAIN200L is created.
+2025-04-01 19:20:37,056 INFO: Number of test images in RAIN200L: 100
+2025-04-01 19:20:39,957 INFO: Loading LPNet_corner model from /home/yiweigui/Deep-Fourier-Upsampling/derain_checkpoint/checkpoint/rain200h/lpnet_corner.pth.
+2025-04-01 19:20:39,983 INFO: Model [LPNetModel] is created.
+2025-04-01 19:20:39,983 INFO: Testing RAIN200L...
+2025-04-01 19:20:53,995 INFO: Validation RAIN200L,		 # psnr: 24.3453	 # ssim: 0.8104
