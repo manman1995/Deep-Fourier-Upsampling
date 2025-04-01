@@ -181,7 +181,7 @@ def main():
 
     # load resume states if necessary
     if opt['path'].get('resume_state'):
-        device_id = torch.cuda.current_device()
+        device_id = torch.cuda.current_device() 
         resume_state = torch.load(
             opt['path']['resume_state'],
             map_location=lambda storage, loc: storage.cuda(device_id))

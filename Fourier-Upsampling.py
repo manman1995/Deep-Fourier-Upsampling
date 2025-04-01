@@ -19,22 +19,6 @@ def calculate_d(x, y, M, N):
     result = term1 + term2 + term3 + term4
     return torch.abs(result) / 4
 
-# def get_D_map(feature):
-#     B, C, H, W = feature.shape
-#     out = torch.zeros((1, 1, 2*H, 2*W), dtype=torch.float32)
-
-#     for i in range(2*H):
-#         for j in range(2*W):
-#             if i < H and j < W:
-#                 out[:, :, i, j] = calculate_d(i, j, H, W)
-#             elif i >= H and j < W:
-#                 out[:, :, i, j] = calculate_d(2*H - i, j, H, W)
-#             elif i < H and j >= W:
-#                 out[:, :, i, j] = calculate_d(i, 2*W - j, H, W)
-#             else:
-#                 out[:, :, i, j] = calculate_d(2*H - i, 2*W - j, H, W)
-#     return out
-
 def get_D_map_optimized(feature):
     B, C, H, W = feature.shape
     d_map = torch.zeros((1, 1, H, W), dtype=torch.float32).cuda()
@@ -234,38 +218,38 @@ class freup_Cornerdinterpolation(nn.Module):
 
 
 class freup_Cornerdinterpolation_v2(nn.Module):
-    def __init__(self, channels):
-        super(freup_Cornerdinterpolation_v2, self).__init__()
+    def __init__(self, channels):
+        super(freup_Cornerdinterpolation_v2, self).__init__()
 
-        self.amp_fuse = nn.Sequential(nn.Conv2d(channels, channels, 1, 1, 0), nn.LeakyReLU(0.1, inplace=False),
-                                      nn.Conv2d(channels, channels, 1, 1, 0))
-        self.pha_fuse = nn.Sequential(nn.Conv2d(channels, channels, 1, 1, 0), nn.LeakyReLU(0.1, inplace=False),
-                                      nn.Conv2d(channels, channels, 1, 1, 0))
+        self.amp_fuse = nn.Sequential(nn.Conv2d(channels, channels, 1, 1, 0), nn.LeakyReLU(0.1, inplace=False),
+                                      nn.Conv2d(channels, channels, 1, 1, 0))
+        self.pha_fuse = nn.Sequential(nn.Conv2d(channels, channels, 1, 1, 0), nn.LeakyReLU(0.1, inplace=False),
+                                      nn.Conv2d(channels, channels, 1, 1, 0))
         self.post = nn.Conv2d(channels,channels,1,1,0)
 
-    def forward(self, x):
-        N, C, H, W = x.shape
+    def forward(self, x):
+        N, C, H, W = x.shape
 
-        fft_x = torch.fft.fft2(x)  # n c h w
-        fft_x = torch.fft.fftshift(fft_x)
-        mag_x = torch.abs(fft_x)
-        pha_x = torch.angle(fft_x)
+        fft_x = torch.fft.fft2(x)  # n c h w
+        fft_x = torch.fft.fftshift(fft_x)
+        mag_x = torch.abs(fft_x)
+        pha_x = torch.angle(fft_x)
 
-        Mag = self.amp_fuse(mag_x)
-        Pha = self.pha_fuse(pha_x)
+        Mag = self.amp_fuse(mag_x)
+        Pha = self.pha_fuse(pha_x)
 
-        Mag = torch.nn.functional.pad(Mag, (W // 2, W // 2, H // 2, H // 2))
-        Pha = torch.nn.functional.pad(Pha, (W // 2, W // 2, H // 2, H // 2))
+        Mag = torch.nn.functional.pad(Mag, (W // 2, W // 2, H // 2, H // 2))
+        Pha = torch.nn.functional.pad(Pha, (W // 2, W // 2, H // 2, H // 2))
 
-        real = Mag * torch.cos(Pha)
-        imag = Mag * torch.sin(Pha)
-        out = torch.complex(real, imag)
+        real = Mag * torch.cos(Pha)
+        imag = Mag * torch.sin(Pha)
+        out = torch.complex(real, imag)
 
-        out = torch.fft.ifftshift(out)
-        output = torch.fft.ifft2(out)
-        output = self.post(torch.abs(output))
+        out = torch.fft.ifftshift(out)
+        output = torch.fft.ifft2(out)
+        output = self.post(torch.abs(output))
 
-        return output
+        return output
 
 
 
@@ -275,15 +259,17 @@ class freup_Cornerdinterpolation_v2(nn.Module):
 class fresadd(nn.Module):
     def __init__(self, channels=32):
         super(fresadd, self).__init__()
-        
+
+         # 初始化傅里叶域的上采样模块（使用Area Interpolation变体）
         self.Fup = freup_Areadinterpolation(channels)
 
+        # 创建一个1x1卷积用于最终融合
         self.fuse = nn.Conv2d(channels, channels,1,1,0)
 
     def forward(self,x):
 
         x1 = x
-        
+        # 应用常规的空间域双线性插值进行上采样（2倍）
         x2 = F.interpolate(x1,scale_factor=2,mode='bilinear')
       
         x3 = self.Fup(x1)
@@ -304,6 +290,7 @@ class frescat(nn.Module):
         
         self.Fup = freup_Areadinterpolation(channels)
 
+        ## 在这里修改kernel size
         self.fuse = nn.Conv2d(2*channels, channels,1,1,0)
 
     def forward(self,x):
