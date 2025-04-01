@@ -17,6 +17,7 @@ python /basicsr/train.py -opt /LLIE/options/train/RAIN200L/LPNet_v2.yml
 Download the pretrained image deraining model from [Google Drive](https://drive.google.com/drive/folders/1zayArqjtukQu9HmtkWQlGzynRNRi-idt?usp=sharing
 ) and add the path to the config file (/LLIE/options/test/RAIN200H(L)/*.yml).
 ```
+
 python /basicsr/test.py -opt /LLIE/options/train/RAIN200H/LPNet_corner.yml
 python /basicsr/test.py -opt /LLIE/options/train/RAIN200H/LPNet_padding.yml
 python /basicsr/test.py -opt /LLIE/options/train/RAIN200H/LPNet_v1.yml

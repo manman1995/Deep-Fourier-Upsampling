@@ -63,7 +63,7 @@ def GaussianPyramid(img,kernel,n):
     return levels[::-1]
 
 
-
+# FourierUp 算法在这里实现
 class freup_pad(nn.Module):
     def __init__(self, channels):
         super(freup_pad, self).__init__()
