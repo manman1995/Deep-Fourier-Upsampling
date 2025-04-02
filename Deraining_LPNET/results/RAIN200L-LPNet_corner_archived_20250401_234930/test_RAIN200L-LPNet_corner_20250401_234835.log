@@ -1,0 +1,77 @@
+2025-04-01 23:48:35,470 INFO: 
+                ____                _       _____  ____
+               / __ ) ____ _ _____ (_)_____/ ___/ / __ \
+              / __  |/ __ `// ___// // ___/\__ \ / /_/ /
+             / /_/ // /_/ /(__  )/ // /__ ___/ // _, _/
+            /_____/ \__,_//____//_/ \___//____//_/ |_|
+     ______                   __   __                 __      __
+    / ____/____   ____   ____/ /  / /   __  __ _____ / /__   / /
+   / / __ / __ \ / __ \ / __  /  / /   / / / // ___// //_/  / /
+  / /_/ // /_/ // /_/ // /_/ /  / /___/ /_/ // /__ / /<    /_/
+  \____/ \____/ \____/ \____/  /_____/\____/ \___//_/|_|  (_)
+    
+Version Information: 
+	PyTorch: 2.0.1+cu117
+	TorchVision: 0.15.2+cu117
+2025-04-01 23:48:35,471 INFO: 
+  name: RAIN200L-LPNet_corner
+  model_type: LPNetModel
+  scale: 1
+  num_gpu: 1
+  manual_seed: 10
+  datasets:[
+    test:[
+      name: RAIN200L
+      type: PairedImageDataset
+      dataroot_gt: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Dataset/Rain100H/norain
+      dataroot_lq: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Dataset/Rain100H/rainy
+      io_backend:[
+        type: disk
+      ]
+      phase: test
+      scale: 1
+    ]
+  ]
+  network_g:[
+    type: LPNet_corner
+  ]
+  path:[
+    pretrain_network_g: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Pretrained_model/rain200h/lpnet_corner.pth
+    strict_load_g: True
+    resume_state: None
+    root: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET
+    results_root: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET/results/RAIN200L-LPNet_corner
+    log: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET/results/RAIN200L-LPNet_corner
+    visualization: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET/results/RAIN200L-LPNet_corner/visualization
+  ]
+  val:[
+    save_img: False
+    grids: False
+    crop_size: 256
+    metrics:[
+      psnr:[
+        type: calculate_psnr
+        crop_border: 0
+        test_y_channel: True
+      ]
+      ssim:[
+        type: calculate_ssim
+        crop_border: 0
+        test_y_channel: True
+      ]
+    ]
+  ]
+  dist_params:[
+    backend: nccl
+    port: 29500
+  ]
+  is_train: False
+  dist: False
+  rank: 0
+  world_size: 1
+
+2025-04-01 23:48:35,477 INFO: Dataset PairedImageDataset - RAIN200L is created.
+2025-04-01 23:48:35,477 INFO: Number of test images in RAIN200L: 100
+2025-04-01 23:48:37,947 INFO: Loading LPNet_corner model from /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Pretrained_model/rain200h/lpnet_corner.pth.
+2025-04-01 23:48:37,985 INFO: Model [LPNetModel] is created.
+2025-04-01 23:48:37,986 INFO: Testing RAIN200L...
