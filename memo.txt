@@ -14,3 +14,17 @@ In conclusion, train.py connects to lpnet_model.py, and then lpnet_model connect
 next step: 
 1. how to modify lpnet_model.py, _arch.py to change the different kernel size
 2. use the original lpnet model and train
+
+request GPU node:
+salloc --account eecs568s001w25_class --partition gpu_mig40,gpu,spgpu --nodes 1 --ntasks 1 --cpus-per-task 1 --gpus 1 --mem 16G --time 00:30:00
+
+training:
+add the training and validating data in config files
+python basicsr/train.py -opt options/train/RAIN200H/LPNet_corner.yml
+python basicsr/train.py -opt options/train/RAIN200H/LPNet_padding.yml
+python /basicsr/train.py -opt /options/train/RAIN200H/LPNet_v1.yml
+python /basicsr/train.py -opt /options/train/RAIN200H/LPNet_v2.yml
+python /basicsr/train.py -opt /options/train/RAIN200L/LPNet_corner.yml
+python /basicsr/train.py -opt /options/train/RAIN200L/LPNet_padding.yml
+python /basicsr/train.py -opt /options/train/RAIN200L/LPNet_v1.yml
+python /basicsr/train.py -opt /options/train/RAIN200L/LPNet_v2.yml
