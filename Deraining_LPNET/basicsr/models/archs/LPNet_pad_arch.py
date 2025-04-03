@@ -96,7 +96,7 @@ class freup_pad(nn.Module):
         output = torch.fft.ifft2(out)
         output = torch.abs(output)
 
-        return self.post(output)
+        return output
 
 
 ######## Laplacian and Gaussian Pyramid ########

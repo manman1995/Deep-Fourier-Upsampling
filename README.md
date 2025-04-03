@@ -15,7 +15,8 @@ python basicsr/test.py -opt options/test/RAIN200H/LPNet_v2.yml
 #### : common used cmds
 request GPU node:
 salloc --account eecs568s001w25_class --partition gpu_mig40,gpu,spgpu 
---nodes 1 --ntasks 1 --cpus-per-task 1 --gpus 1 --mem 16G --time 00:30:00
+ --nodes 1 --ntasks 1 --cpus-per-task 1 --gpus 1 --mem 16G --time 00:30:00
+scancel <job ID>
 
 
 如果实现不加入conv的周期填充？
@@ -29,3 +30,28 @@ salloc --account eecs568s001w25_class --partition gpu_mig40,gpu,spgpu
 2. 做ft得到frequency domain, periodic padding, ift get the spatial domain
 
 in theory, method 1 is equal to method 2. However, 
+
+Implementation of theorem-1
+1. add Deraining_LPNET/basicsr/models/archs/LPNet_pad_theory_arch.py
+
+Result:
+LPNet_padding.yml: 2025-04-03 15:34:29,488 INFO: Validation RAIN200H,               # psnr: 17.9493
+LPNet_padding_theory.yml: 
+
+Current Problems:
+cannot both train lpnet_pad and lpnet_pad_theory model. It seems be related to 
+loading the pretrained model. (*.pth files) 
+
+Solution：
+检查Deraining_LPNET/experiments/RAIN200H-LPNet_pad/training_states，是否有state
+文件，他会自动恢复训练。如果想从头训练，需要删除。 
+
+Result: 
+padding: 2025-04-03 18:32:34,678 INFO: Validation RAIN200H,  # psnr: 16.7730
+padding_theory: 2025-04-03 18:37:01,698 INFO: Validation RAIN200H,
+    # psnr: 17.2927
+
+Analysis: the result is counter-intuitive, since the padding_theory has better
+    performance. However, this is just a very little comparsion and datasets are
+    very tiny (100 pictures). I will try introduce more detailed config and 
+    larger dataset in this comparsion.

@@ -1,0 +1,175 @@
+2025-04-03 14:40:37,049 INFO: 
+                ____                _       _____  ____
+               / __ ) ____ _ _____ (_)_____/ ___/ / __ \
+              / __  |/ __ `// ___// // ___/\__ \ / /_/ /
+             / /_/ // /_/ /(__  )/ // /__ ___/ // _, _/
+            /_____/ \__,_//____//_/ \___//____//_/ |_|
+     ______                   __   __                 __      __
+    / ____/____   ____   ____/ /  / /   __  __ _____ / /__   / /
+   / / __ / __ \ / __ \ / __  /  / /   / / / // ___// //_/  / /
+  / /_/ // /_/ // /_/ // /_/ /  / /___/ /_/ // /__ / /<    /_/
+  \____/ \____/ \____/ \____/  /_____/\____/ \___//_/|_|  (_)
+    
+Version Information: 
+	PyTorch: 2.0.1+cu117
+	TorchVision: 0.15.2+cu117
+2025-04-03 14:40:37,050 INFO: 
+  name: RAIN200H-LPNet_pad
+  model_type: LPNetModel
+  scale: 1
+  num_gpu: 1
+  manual_seed: 10
+  datasets:[
+    train:[
+      name: RAIN200H
+      type: PairedImageDataset
+      dataroot_gt: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Dataset/Rain100H/norain
+      dataroot_lq: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Dataset/Rain100H/rainy
+      filename_tmpl: {}
+      io_backend:[
+        type: disk
+      ]
+      gt_size: 128
+      use_flip: True
+      use_rot: True
+      use_shuffle: True
+      num_worker_per_gpu: 0
+      batch_size_per_gpu: 12
+      dataset_enlarge_ratio: 1
+      prefetch_mode: None
+      phase: train
+      scale: 1
+    ]
+    val:[
+      name: RAIN200H
+      type: PairedImageDataset
+      dataroot_gt: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Dataset/Rain100H/norain
+      dataroot_lq: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Dataset/Rain100H/rainy
+      io_backend:[
+        type: disk
+      ]
+      phase: val
+      scale: 1
+    ]
+  ]
+  network_g:[
+    type: LPNet_pad
+  ]
+  path:[
+    pretrain_network_g: None
+    strict_load_g: False
+    resume_state: experiments/RAIN200H-LPNet_pad/training_states/1000.state
+    root: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET
+    experiments_root: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET/experiments/RAIN200H-LPNet_pad
+    models: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET/experiments/RAIN200H-LPNet_pad/models
+    training_states: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET/experiments/RAIN200H-LPNet_pad/training_states
+    log: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET/experiments/RAIN200H-LPNet_pad
+    visualization: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET/experiments/RAIN200H-LPNet_pad/visualization
+  ]
+  train:[
+    optim_g:[
+      type: Adam
+      lr: 0.001
+      weight_decay: 0
+      betas: [0.9, 0.99]
+    ]
+    scheduler:[
+      type: TrueCosineAnnealingLR
+      T_max: 1000
+      eta_min: 1e-07
+    ]
+    total_iter: 1000
+    warmup_iter: 0
+    pixel_opt:[
+      type: L1Loss
+      loss_weight: 0.5
+      reduction: mean
+    ]
+  ]
+  val:[
+    val_freq: 200
+    save_img: False
+    grids: False
+    crop_size: 256
+    max_minibatch: 8
+    metrics:[
+      psnr:[
+        type: calculate_psnr
+        crop_border: 0
+        test_y_channel: True
+      ]
+    ]
+  ]
+  logger:[
+    print_freq: 200
+    save_checkpoint_freq: 500
+    use_tb_logger: True
+    wandb:[
+      project: None
+      resume_id: None
+    ]
+  ]
+  dist_params:[
+    backend: nccl
+    port: 29500
+  ]
+  is_train: True
+  dist: False
+  rank: 0
+  world_size: 1
+
+2025-04-03 14:40:37,172 INFO: Dataset PairedImageDataset - RAIN200H is created.
+2025-04-03 14:40:37,173 INFO: Training statistics:
+	Number of train images: 100
+	Dataset enlarge ratio: 1
+	Batch size per gpu: 12
+	World size (gpu number): 1
+	Require iter number per epoch: 9
+	Total epochs: 112; iters: 1000.
+2025-04-03 14:40:37,176 INFO: Dataset PairedImageDataset - RAIN200H is created.
+2025-04-03 14:40:37,177 INFO: Number of val images/folders in RAIN200H: 100
+2025-04-03 14:40:37,177 INFO: Set pretrain_network_g to /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET/experiments/RAIN200H-LPNet_pad/models/net_g_1000.pth
+2025-04-03 14:40:37,200 INFO: Loading LPNet_pad model from /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET/experiments/RAIN200H-LPNet_pad/models/net_g_1000.pth.
+2025-04-03 14:40:37,206 WARNING: Current net - loaded net:
+2025-04-03 14:40:37,206 WARNING:   fup0.amp_fuse.0.bias
+2025-04-03 14:40:37,207 WARNING:   fup0.amp_fuse.0.weight
+2025-04-03 14:40:37,207 WARNING:   fup0.amp_fuse.2.bias
+2025-04-03 14:40:37,207 WARNING:   fup0.amp_fuse.2.weight
+2025-04-03 14:40:37,207 WARNING:   fup0.pha_fuse.0.bias
+2025-04-03 14:40:37,207 WARNING:   fup0.pha_fuse.0.weight
+2025-04-03 14:40:37,207 WARNING:   fup0.pha_fuse.2.bias
+2025-04-03 14:40:37,207 WARNING:   fup0.pha_fuse.2.weight
+2025-04-03 14:40:37,207 WARNING:   fup0.post.bias
+2025-04-03 14:40:37,207 WARNING:   fup0.post.weight
+2025-04-03 14:40:37,207 WARNING:   fup1.amp_fuse.0.bias
+2025-04-03 14:40:37,207 WARNING:   fup1.amp_fuse.0.weight
+2025-04-03 14:40:37,207 WARNING:   fup1.amp_fuse.2.bias
+2025-04-03 14:40:37,207 WARNING:   fup1.amp_fuse.2.weight
+2025-04-03 14:40:37,207 WARNING:   fup1.pha_fuse.0.bias
+2025-04-03 14:40:37,207 WARNING:   fup1.pha_fuse.0.weight
+2025-04-03 14:40:37,207 WARNING:   fup1.pha_fuse.2.bias
+2025-04-03 14:40:37,207 WARNING:   fup1.pha_fuse.2.weight
+2025-04-03 14:40:37,207 WARNING:   fup1.post.bias
+2025-04-03 14:40:37,207 WARNING:   fup1.post.weight
+2025-04-03 14:40:37,207 WARNING:   fup2.amp_fuse.0.bias
+2025-04-03 14:40:37,207 WARNING:   fup2.amp_fuse.0.weight
+2025-04-03 14:40:37,207 WARNING:   fup2.amp_fuse.2.bias
+2025-04-03 14:40:37,207 WARNING:   fup2.amp_fuse.2.weight
+2025-04-03 14:40:37,208 WARNING:   fup2.pha_fuse.0.bias
+2025-04-03 14:40:37,208 WARNING:   fup2.pha_fuse.0.weight
+2025-04-03 14:40:37,208 WARNING:   fup2.pha_fuse.2.bias
+2025-04-03 14:40:37,208 WARNING:   fup2.pha_fuse.2.weight
+2025-04-03 14:40:37,208 WARNING:   fup2.post.bias
+2025-04-03 14:40:37,208 WARNING:   fup2.post.weight
+2025-04-03 14:40:37,208 WARNING:   fup3.amp_fuse.0.bias
+2025-04-03 14:40:37,208 WARNING:   fup3.amp_fuse.0.weight
+2025-04-03 14:40:37,208 WARNING:   fup3.amp_fuse.2.bias
+2025-04-03 14:40:37,208 WARNING:   fup3.amp_fuse.2.weight
+2025-04-03 14:40:37,208 WARNING:   fup3.pha_fuse.0.bias
+2025-04-03 14:40:37,208 WARNING:   fup3.pha_fuse.0.weight
+2025-04-03 14:40:37,208 WARNING:   fup3.pha_fuse.2.bias
+2025-04-03 14:40:37,208 WARNING:   fup3.pha_fuse.2.weight
+2025-04-03 14:40:37,208 WARNING:   fup3.post.bias
+2025-04-03 14:40:37,208 WARNING:   fup3.post.weight
+2025-04-03 14:40:37,208 WARNING: Loaded net - current net:
+2025-04-03 14:40:37,212 INFO: Model [LPNetModel] is created.

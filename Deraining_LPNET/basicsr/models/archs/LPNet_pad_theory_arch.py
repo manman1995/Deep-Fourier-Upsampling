@@ -1,4 +1,7 @@
 # ------------------------------------------------------------------------
+# Purpose: Implementation of  Theorem-1 in the paper
+# Author: Yiwei Gui
+# Date: 2025/4/3
 # Copyright (c) 2021 megvii-model. All Rights Reserved.
 # ------------------------------------------------------------------------
 '''
@@ -84,47 +87,11 @@ class FourierUpTheoremOne(nn.Module):
         return x_up
 
 
-# FourierUp 算法在这里实现
-class freup_pad(nn.Module):
-    def __init__(self, channels):
-        super(freup_pad, self).__init__()
-
-        self.amp_fuse = nn.Sequential(nn.Conv2d(channels,channels,1,1,0),nn.LeakyReLU(0.1,inplace=False),
-                                      nn.Conv2d(channels,channels,1,1,0))
-        self.pha_fuse = nn.Sequential(nn.Conv2d(channels,channels,1,1,0),nn.LeakyReLU(0.1,inplace=False),
-                                      nn.Conv2d(channels,channels,1,1,0))
-
-        self.post = nn.Conv2d(channels,channels,1,1,0)
-
-    def forward(self, x):
-
-        N, C, H, W = x.shape
-
-        fft_x = torch.fft.fft2(x)
-        mag_x = torch.abs(fft_x)
-        pha_x = torch.angle(fft_x)
-
-        Mag = self.amp_fuse(mag_x)
-        Pha = self.pha_fuse(pha_x)
-
-        amp_fuse = torch.tile(Mag, (2, 2))
-        pha_fuse = torch.tile(Pha, (2, 2))
-
-        real = amp_fuse * torch.cos(pha_fuse)
-        imag = amp_fuse * torch.sin(pha_fuse)
-        out = torch.complex(real, imag)
-
-        output = torch.fft.ifft2(out)
-        output = torch.abs(output)
-
-        return self.post(output)
-
-
 ######## Laplacian and Gaussian Pyramid ########
-class LPNet_pad(nn.Module):
+class LPNet_pad_theory(nn.Module):
 
     def __init__(self, in_chn=3, num_pyramids=5,num_blocks=5, num_feature=32,relu_slope=0.2):
-        super(LPNet_pad, self).__init__()
+        super(LPNet_pad_theory, self).__init__()
         self.num_pyramids = num_pyramids
         self.num_blocks = num_blocks
         self.num_feature = num_feature
