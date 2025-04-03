@@ -45,7 +45,7 @@ def dynamic_instantiation(modules, cls_type, opt):
         raise ValueError(f'{cls_type} is not found.')
     return cls_(**opt)
 
-
+# 确定网络架构
 def define_network(opt):
     network_type = opt.pop('type')
     net = dynamic_instantiation(_arch_modules, network_type, opt)

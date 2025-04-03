@@ -18,6 +18,7 @@ model_filenames = [
     if v.endswith('_model.py')
 ]
 # import all the model modules
+# 在Deraining_LPNET/basicsr/models路径下导入
 _model_modules = [
     importlib.import_module(f'basicsr.models.{file_name}')
     for file_name in model_filenames

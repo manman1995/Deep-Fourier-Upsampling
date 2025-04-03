@@ -61,6 +61,27 @@ def GaussianPyramid(img,kernel,n):
         levels.append(low)
 
     return levels[::-1]
+# Theorem-1 implementation
+class FourierUpTheoremOne(nn.Module):
+    def __init__(self):
+        super(FourierUpTheoremOne, self).__init__()
+
+    def forward(self, x):
+        B, C, H, W = x.shape
+        # 做二维 FFT
+        fft_x = torch.fft.fft2(x)
+
+        # 周期复制到 2H x 2W，乘以 1/4 缩放
+        fft_x_up = fft_x / 4
+
+        fft_x_up = fft_x_up.unsqueeze(-1).unsqueeze(-1)  # [B, C, H, W, 1, 1]
+        fft_x_up = fft_x_up.repeat(1, 1, 1, 1, 2, 2)     # → 每个点复制到四个象限
+        fft_x_up = fft_x_up.permute(0, 1, 4, 2, 5, 3).reshape(B, C, 2*H, 2*W)
+
+        # IFFT 回到空间域
+        x_up = torch.fft.ifft2(fft_x_up).real  # 取实部
+
+        return x_up
 
 
 # FourierUp 算法在这里实现
@@ -117,22 +138,24 @@ class LPNet_pad(nn.Module):
 
         self.subnet_0 = Subnet(num_feature=int((self.num_feature)/16), num_blocks=self.num_blocks)
         self.relu_0 = nn.LeakyReLU(0.2, inplace=False)
-        self.fup0 = freup_pad(3)
+        self.fup0 = FourierUpTheoremOne()
         self.fuse_0 = nn.Conv2d(6,3,1,1,0)
 
         self.subnet_1 = Subnet(num_feature=int((self.num_feature) / 8), num_blocks=self.num_blocks)
         self.relu_1 = nn.LeakyReLU(0.2, inplace=False)
-        self.fup1 = freup_pad(3)
+        self.fup1 = FourierUpTheoremOne()
         self.fuse_1 = nn.Conv2d(6,3,1,1,0)
 
         self.subnet_2 = Subnet(num_feature=int((self.num_feature) / 4), num_blocks=self.num_blocks)
         self.relu_2 = nn.LeakyReLU(0.2, inplace=False)
-        self.fup2 = freup_pad(3)
+        self.fup2 = FourierUpTheoremOne()
         self.fuse_2 = nn.Conv2d(6,3,1,1,0)
+
         self.subnet_3 = Subnet(num_feature=int((self.num_feature) / 2), num_blocks=self.num_blocks)
         self.relu_3 = nn.LeakyReLU(0.2, inplace=False)
-        self.fup3= freup_pad(3)
+        self.fup3= FourierUpTheoremOne()
         self.fuse_3 = nn.Conv2d(6,3,1,1,0)
+        
         self.subnet_4 = Subnet(num_feature=int((self.num_feature) / 1), num_blocks=self.num_blocks)
         self.relu_4 = nn.LeakyReLU(0.2, inplace=False)
 
