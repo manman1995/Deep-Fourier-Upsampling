@@ -56,4 +56,4 @@ Analysis: the result is counter-intuitive, since the padding_theory has better
     very tiny (100 pictures). I will try introduce more detailed config and 
     larger dataset in this comparsion.
 
-i love  me
+i love music
