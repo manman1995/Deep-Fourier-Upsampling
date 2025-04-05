@@ -55,8 +55,5 @@ Analysis: the result is counter-intuitive, since the padding_theory has better
     performance. However, this is just a very little comparsion and datasets are
     very tiny (100 pictures). I will try introduce more detailed config and 
     larger dataset in this comparsion.
-
-
-
-
+    
 I love yiweigui.
