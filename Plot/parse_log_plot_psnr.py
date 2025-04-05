@@ -82,12 +82,10 @@ def plot_psnr(log_files, labels=None, output_path=None, title="PSNR vs Epochs", 
     plt.title(title, fontsize=16)
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.legend(loc='best')
-    plt.xlim(right=925)
-    
-    if epochs:
-        max_ticks = 10
-        tick_indices = np.linspace(0, len(epochs) - 1, min(len(epochs), max_ticks), dtype=int)
-        plt.xticks([epochs[i] for i in tick_indices], rotation=45)
+    plt.xlim(0, 925)
+
+    plt.xticks(np.linspace(0, 925, 10, dtype=int), rotation=45)
+
     
     plt.tight_layout()
     
