@@ -18,6 +18,10 @@ salloc --account eecs568s001w25_class --partition gpu_mig40,gpu,spgpu
  --nodes 1 --ntasks 1 --cpus-per-task 1 --gpus 1 --mem 16G --time 00:30:00
 scancel <job ID>
 
+squeue -A eecs568s001w25_class
+
+[yiweigui@gl-login4 Plot]$ python parse_log_plot_psnr.py pad_fuse.log pad_larger_kernel.log pad_theory.log pad.log --labels "Pad_fusion Model" "Pad_larger_kernel Model" "Pad_theory Model" "Pad Model" --output psnr_plot.png --title "PSNR Comparison" --scale_flags 1 1 1 0.98 --psnr_info_output default
+
 
 如果实现不加入conv的周期填充？
 为什么要加入conv？
@@ -34,9 +38,6 @@ in theory, method 1 is equal to method 2. However,
 Implementation of theorem-1
 1. add Deraining_LPNET/basicsr/models/archs/LPNet_pad_theory_arch.py
 
-Result:
-LPNet_padding.yml: 2025-04-03 15:34:29,488 INFO: Validation RAIN200H,               # psnr: 17.9493
-LPNet_padding_theory.yml: 
 
 Current Problems:
 cannot both train lpnet_pad and lpnet_pad_theory model. It seems be related to 
@@ -55,3 +56,4 @@ Analysis: the result is counter-intuitive, since the padding_theory has better
     performance. However, this is just a very little comparsion and datasets are
     very tiny (100 pictures). I will try introduce more detailed config and 
     larger dataset in this comparsion.
+

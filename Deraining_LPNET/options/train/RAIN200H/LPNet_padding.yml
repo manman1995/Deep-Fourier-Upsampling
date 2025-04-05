@@ -29,8 +29,8 @@ datasets:
 
     # data loader
     use_shuffle: true
-    num_worker_per_gpu: 0
-    batch_size_per_gpu: 12
+    num_worker_per_gpu: 10
+    batch_size_per_gpu: 192  #originally 12
     dataset_enlarge_ratio: 1
     prefetch_mode: ~
 
@@ -48,10 +48,9 @@ network_g:
   type: LPNet_pad
 
 
-
 # path
 path:
-  pretrain_network_g: ~	
+  pretrain_network_g: ~
   strict_load_g: true
   resume_state: ~
 
@@ -65,10 +64,10 @@ train:
 
   scheduler:
     type: TrueCosineAnnealingLR
-    T_max: 1000  
+    T_max: 10000 # originally 400000
     eta_min: !!float 1e-7
 
-  total_iter: 1000
+  total_iter: 10000 # originally 400000
   warmup_iter: 0 # no warm up 10000
 
   # losses
@@ -82,7 +81,7 @@ train:
 val:
 #  val_freq: 10
 #  val_freq: !!float 2.5e4
-  val_freq: 200
+  val_freq: !!float 1e2
   save_img: false
   grids: false
   crop_size: 256
@@ -96,8 +95,8 @@ val:
 
 # logging settings
 logger:
-  print_freq: 200
-  save_checkpoint_freq: 500
+  print_freq: 100 # originally 200
+  save_checkpoint_freq: !!float 5e2 # originally 2e4
   use_tb_logger: true
   wandb:
     project: ~

@@ -1,0 +1,189 @@
+2025-04-04 18:37:21,020 INFO: 
+                ____                _       _____  ____
+               / __ ) ____ _ _____ (_)_____/ ___/ / __ \
+              / __  |/ __ `// ___// // ___/\__ \ / /_/ /
+             / /_/ // /_/ /(__  )/ // /__ ___/ // _, _/
+            /_____/ \__,_//____//_/ \___//____//_/ |_|
+     ______                   __   __                 __      __
+    / ____/____   ____   ____/ /  / /   __  __ _____ / /__   / /
+   / / __ / __ \ / __ \ / __  /  / /   / / / // ___// //_/  / /
+  / /_/ // /_/ // /_/ // /_/ /  / /___/ /_/ // /__ / /<    /_/
+  \____/ \____/ \____/ \____/  /_____/\____/ \___//_/|_|  (_)
+    
+Version Information: 
+	PyTorch: 2.0.1+cu117
+	TorchVision: 0.15.2+cu117
+2025-04-04 18:37:21,021 INFO: 
+  name: RAIN200H-LPNet_pad_fusion
+  model_type: LPNetModel
+  scale: 1
+  num_gpu: 1
+  manual_seed: 10
+  datasets:[
+    test:[
+      name: RAIN200H
+      type: PairedImageDataset
+      dataroot_gt: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Dataset/Rain100H/norain
+      dataroot_lq: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Dataset/Rain100H/rainy
+      io_backend:[
+        type: disk
+      ]
+      phase: test
+      scale: 1
+    ]
+  ]
+  network_g:[
+    type: LPNet_pad_fusion
+  ]
+  path:[
+    pretrain_network_g: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Pretrained_model/pad_fusion/net_g_6500.pth
+    strict_load_g: True
+    resume_state: None
+    root: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET
+    results_root: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET/results/RAIN200H-LPNet_pad_fusion
+    log: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET/results/RAIN200H-LPNet_pad_fusion
+    visualization: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET/results/RAIN200H-LPNet_pad_fusion/visualization
+  ]
+  val:[
+    save_img: False
+    grids: False
+    crop_size: 256
+    metrics:[
+      psnr:[
+        type: calculate_psnr
+        crop_border: 0
+        test_y_channel: True
+      ]
+      ssim:[
+        type: calculate_ssim
+        crop_border: 0
+        test_y_channel: True
+      ]
+    ]
+  ]
+  dist_params:[
+    backend: nccl
+    port: 29500
+  ]
+  is_train: False
+  dist: False
+  rank: 0
+  world_size: 1
+
+2025-04-04 18:37:21,024 INFO: Dataset PairedImageDataset - RAIN200H is created.
+2025-04-04 18:37:21,024 INFO: Number of test images in RAIN200H: 100
+2025-04-04 18:37:21,687 INFO: Loading LPNet_pad_fusion model from /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Pretrained_model/pad_fusion/net_g_6500.pth.
+2025-04-04 18:37:21,714 WARNING: Current net - loaded net:
+2025-04-04 18:37:21,714 WARNING:   fup0_corner.amp_fuse.0.bias
+2025-04-04 18:37:21,714 WARNING:   fup0_corner.amp_fuse.0.weight
+2025-04-04 18:37:21,714 WARNING:   fup0_corner.amp_fuse.2.bias
+2025-04-04 18:37:21,714 WARNING:   fup0_corner.amp_fuse.2.weight
+2025-04-04 18:37:21,714 WARNING:   fup0_corner.pha_fuse.0.bias
+2025-04-04 18:37:21,714 WARNING:   fup0_corner.pha_fuse.0.weight
+2025-04-04 18:37:21,714 WARNING:   fup0_corner.pha_fuse.2.bias
+2025-04-04 18:37:21,714 WARNING:   fup0_corner.pha_fuse.2.weight
+2025-04-04 18:37:21,714 WARNING:   fup0_pad.amp_fuse.0.bias
+2025-04-04 18:37:21,714 WARNING:   fup0_pad.amp_fuse.0.weight
+2025-04-04 18:37:21,714 WARNING:   fup0_pad.amp_fuse.2.bias
+2025-04-04 18:37:21,714 WARNING:   fup0_pad.amp_fuse.2.weight
+2025-04-04 18:37:21,714 WARNING:   fup0_pad.pha_fuse.0.bias
+2025-04-04 18:37:21,714 WARNING:   fup0_pad.pha_fuse.0.weight
+2025-04-04 18:37:21,714 WARNING:   fup0_pad.pha_fuse.2.bias
+2025-04-04 18:37:21,714 WARNING:   fup0_pad.pha_fuse.2.weight
+2025-04-04 18:37:21,714 WARNING:   fup0_pad.post.bias
+2025-04-04 18:37:21,715 WARNING:   fup0_pad.post.weight
+2025-04-04 18:37:21,715 WARNING:   fup1_corner.amp_fuse.0.bias
+2025-04-04 18:37:21,715 WARNING:   fup1_corner.amp_fuse.0.weight
+2025-04-04 18:37:21,715 WARNING:   fup1_corner.amp_fuse.2.bias
+2025-04-04 18:37:21,715 WARNING:   fup1_corner.amp_fuse.2.weight
+2025-04-04 18:37:21,716 WARNING:   fup1_corner.pha_fuse.0.bias
+2025-04-04 18:37:21,716 WARNING:   fup1_corner.pha_fuse.0.weight
+2025-04-04 18:37:21,716 WARNING:   fup1_corner.pha_fuse.2.bias
+2025-04-04 18:37:21,716 WARNING:   fup1_corner.pha_fuse.2.weight
+2025-04-04 18:37:21,716 WARNING:   fup1_pad.amp_fuse.0.bias
+2025-04-04 18:37:21,716 WARNING:   fup1_pad.amp_fuse.0.weight
+2025-04-04 18:37:21,716 WARNING:   fup1_pad.amp_fuse.2.bias
+2025-04-04 18:37:21,716 WARNING:   fup1_pad.amp_fuse.2.weight
+2025-04-04 18:37:21,716 WARNING:   fup1_pad.pha_fuse.0.bias
+2025-04-04 18:37:21,716 WARNING:   fup1_pad.pha_fuse.0.weight
+2025-04-04 18:37:21,716 WARNING:   fup1_pad.pha_fuse.2.bias
+2025-04-04 18:37:21,716 WARNING:   fup1_pad.pha_fuse.2.weight
+2025-04-04 18:37:21,716 WARNING:   fup1_pad.post.bias
+2025-04-04 18:37:21,716 WARNING:   fup1_pad.post.weight
+2025-04-04 18:37:21,716 WARNING:   fup2_corner.amp_fuse.0.bias
+2025-04-04 18:37:21,716 WARNING:   fup2_corner.amp_fuse.0.weight
+2025-04-04 18:37:21,716 WARNING:   fup2_corner.amp_fuse.2.bias
+2025-04-04 18:37:21,716 WARNING:   fup2_corner.amp_fuse.2.weight
+2025-04-04 18:37:21,716 WARNING:   fup2_corner.pha_fuse.0.bias
+2025-04-04 18:37:21,716 WARNING:   fup2_corner.pha_fuse.0.weight
+2025-04-04 18:37:21,716 WARNING:   fup2_corner.pha_fuse.2.bias
+2025-04-04 18:37:21,716 WARNING:   fup2_corner.pha_fuse.2.weight
+2025-04-04 18:37:21,716 WARNING:   fup2_pad.amp_fuse.0.bias
+2025-04-04 18:37:21,717 WARNING:   fup2_pad.amp_fuse.0.weight
+2025-04-04 18:37:21,717 WARNING:   fup2_pad.amp_fuse.2.bias
+2025-04-04 18:37:21,717 WARNING:   fup2_pad.amp_fuse.2.weight
+2025-04-04 18:37:21,717 WARNING:   fup2_pad.pha_fuse.0.bias
+2025-04-04 18:37:21,717 WARNING:   fup2_pad.pha_fuse.0.weight
+2025-04-04 18:37:21,717 WARNING:   fup2_pad.pha_fuse.2.bias
+2025-04-04 18:37:21,717 WARNING:   fup2_pad.pha_fuse.2.weight
+2025-04-04 18:37:21,717 WARNING:   fup2_pad.post.bias
+2025-04-04 18:37:21,717 WARNING:   fup2_pad.post.weight
+2025-04-04 18:37:21,717 WARNING:   fup3_corner.amp_fuse.0.bias
+2025-04-04 18:37:21,717 WARNING:   fup3_corner.amp_fuse.0.weight
+2025-04-04 18:37:21,717 WARNING:   fup3_corner.amp_fuse.2.bias
+2025-04-04 18:37:21,717 WARNING:   fup3_corner.amp_fuse.2.weight
+2025-04-04 18:37:21,717 WARNING:   fup3_corner.pha_fuse.0.bias
+2025-04-04 18:37:21,717 WARNING:   fup3_corner.pha_fuse.0.weight
+2025-04-04 18:37:21,717 WARNING:   fup3_corner.pha_fuse.2.bias
+2025-04-04 18:37:21,717 WARNING:   fup3_corner.pha_fuse.2.weight
+2025-04-04 18:37:21,717 WARNING:   fup3_pad.amp_fuse.0.bias
+2025-04-04 18:37:21,717 WARNING:   fup3_pad.amp_fuse.0.weight
+2025-04-04 18:37:21,717 WARNING:   fup3_pad.amp_fuse.2.bias
+2025-04-04 18:37:21,717 WARNING:   fup3_pad.amp_fuse.2.weight
+2025-04-04 18:37:21,717 WARNING:   fup3_pad.pha_fuse.0.bias
+2025-04-04 18:37:21,717 WARNING:   fup3_pad.pha_fuse.0.weight
+2025-04-04 18:37:21,717 WARNING:   fup3_pad.pha_fuse.2.bias
+2025-04-04 18:37:21,718 WARNING:   fup3_pad.pha_fuse.2.weight
+2025-04-04 18:37:21,718 WARNING:   fup3_pad.post.bias
+2025-04-04 18:37:21,718 WARNING:   fup3_pad.post.weight
+2025-04-04 18:37:21,718 WARNING: Loaded net - current net:
+2025-04-04 18:37:21,718 WARNING:   fup0.amp_fuse.0.bias
+2025-04-04 18:37:21,718 WARNING:   fup0.amp_fuse.0.weight
+2025-04-04 18:37:21,718 WARNING:   fup0.amp_fuse.2.bias
+2025-04-04 18:37:21,718 WARNING:   fup0.amp_fuse.2.weight
+2025-04-04 18:37:21,718 WARNING:   fup0.pha_fuse.0.bias
+2025-04-04 18:37:21,718 WARNING:   fup0.pha_fuse.0.weight
+2025-04-04 18:37:21,718 WARNING:   fup0.pha_fuse.2.bias
+2025-04-04 18:37:21,718 WARNING:   fup0.pha_fuse.2.weight
+2025-04-04 18:37:21,718 WARNING:   fup0.post.bias
+2025-04-04 18:37:21,718 WARNING:   fup0.post.weight
+2025-04-04 18:37:21,718 WARNING:   fup1.amp_fuse.0.bias
+2025-04-04 18:37:21,718 WARNING:   fup1.amp_fuse.0.weight
+2025-04-04 18:37:21,718 WARNING:   fup1.amp_fuse.2.bias
+2025-04-04 18:37:21,718 WARNING:   fup1.amp_fuse.2.weight
+2025-04-04 18:37:21,718 WARNING:   fup1.pha_fuse.0.bias
+2025-04-04 18:37:21,718 WARNING:   fup1.pha_fuse.0.weight
+2025-04-04 18:37:21,718 WARNING:   fup1.pha_fuse.2.bias
+2025-04-04 18:37:21,718 WARNING:   fup1.pha_fuse.2.weight
+2025-04-04 18:37:21,719 WARNING:   fup1.post.bias
+2025-04-04 18:37:21,719 WARNING:   fup1.post.weight
+2025-04-04 18:37:21,719 WARNING:   fup2.amp_fuse.0.bias
+2025-04-04 18:37:21,719 WARNING:   fup2.amp_fuse.0.weight
+2025-04-04 18:37:21,719 WARNING:   fup2.amp_fuse.2.bias
+2025-04-04 18:37:21,719 WARNING:   fup2.amp_fuse.2.weight
+2025-04-04 18:37:21,719 WARNING:   fup2.pha_fuse.0.bias
+2025-04-04 18:37:21,719 WARNING:   fup2.pha_fuse.0.weight
+2025-04-04 18:37:21,719 WARNING:   fup2.pha_fuse.2.bias
+2025-04-04 18:37:21,719 WARNING:   fup2.pha_fuse.2.weight
+2025-04-04 18:37:21,719 WARNING:   fup2.post.bias
+2025-04-04 18:37:21,719 WARNING:   fup2.post.weight
+2025-04-04 18:37:21,719 WARNING:   fup3.amp_fuse.0.bias
+2025-04-04 18:37:21,719 WARNING:   fup3.amp_fuse.0.weight
+2025-04-04 18:37:21,719 WARNING:   fup3.amp_fuse.2.bias
+2025-04-04 18:37:21,719 WARNING:   fup3.amp_fuse.2.weight
+2025-04-04 18:37:21,719 WARNING:   fup3.pha_fuse.0.bias
+2025-04-04 18:37:21,719 WARNING:   fup3.pha_fuse.0.weight
+2025-04-04 18:37:21,719 WARNING:   fup3.pha_fuse.2.bias
+2025-04-04 18:37:21,719 WARNING:   fup3.pha_fuse.2.weight
+2025-04-04 18:37:21,719 WARNING:   fup3.post.bias
+2025-04-04 18:37:21,719 WARNING:   fup3.post.weight

@@ -1,0 +1,168 @@
+2025-04-04 12:40:34,700 INFO: 
+                ____                _       _____  ____
+               / __ ) ____ _ _____ (_)_____/ ___/ / __ \
+              / __  |/ __ `// ___// // ___/\__ \ / /_/ /
+             / /_/ // /_/ /(__  )/ // /__ ___/ // _, _/
+            /_____/ \__,_//____//_/ \___//____//_/ |_|
+     ______                   __   __                 __      __
+    / ____/____   ____   ____/ /  / /   __  __ _____ / /__   / /
+   / / __ / __ \ / __ \ / __  /  / /   / / / // ___// //_/  / /
+  / /_/ // /_/ // /_/ // /_/ /  / /___/ /_/ // /__ / /<    /_/
+  \____/ \____/ \____/ \____/  /_____/\____/ \___//_/|_|  (_)
+    
+Version Information: 
+	PyTorch: 2.0.1+cu117
+	TorchVision: 0.15.2+cu117
+2025-04-04 12:40:34,700 INFO: 
+  name: RAIN200H-LPNet_pad_theory
+  model_type: LPNetModel
+  scale: 1
+  num_gpu: 1
+  manual_seed: 10
+  datasets:[
+    train:[
+      name: RAIN200H
+      type: PairedImageDataset
+      dataroot_gt: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Dataset/RainTrainH_modified/RainTrainH_modified/norain
+      dataroot_lq: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Dataset/RainTrainH_modified/RainTrainH_modified/rain
+      filename_tmpl: {}
+      io_backend:[
+        type: disk
+      ]
+      gt_size: 128
+      use_flip: True
+      use_rot: True
+      use_shuffle: True
+      num_worker_per_gpu: 10
+      batch_size_per_gpu: 192
+      dataset_enlarge_ratio: 1
+      prefetch_mode: None
+      phase: train
+      scale: 1
+    ]
+    val:[
+      name: RAIN200H
+      type: PairedImageDataset
+      dataroot_gt: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Dataset/Rain100H/norain
+      dataroot_lq: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Dataset/Rain100H/rainy
+      io_backend:[
+        type: disk
+      ]
+      phase: val
+      scale: 1
+    ]
+  ]
+  network_g:[
+    type: LPNet_pad_theory
+  ]
+  path:[
+    pretrain_network_g: None
+    strict_load_g: True
+    resume_state: experiments/RAIN200H-LPNet_pad_theory/training_states/5000.state
+    root: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET
+    experiments_root: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET/experiments/RAIN200H-LPNet_pad_theory
+    models: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET/experiments/RAIN200H-LPNet_pad_theory/models
+    training_states: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET/experiments/RAIN200H-LPNet_pad_theory/training_states
+    log: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET/experiments/RAIN200H-LPNet_pad_theory
+    visualization: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET/experiments/RAIN200H-LPNet_pad_theory/visualization
+  ]
+  train:[
+    optim_g:[
+      type: Adam
+      lr: 0.001
+      weight_decay: 0
+      betas: [0.9, 0.99]
+    ]
+    scheduler:[
+      type: TrueCosineAnnealingLR
+      T_max: 10000
+      eta_min: 1e-07
+    ]
+    total_iter: 10000
+    warmup_iter: 0
+    pixel_opt:[
+      type: L1Loss
+      loss_weight: 0.5
+      reduction: mean
+    ]
+  ]
+  val:[
+    val_freq: 100.0
+    save_img: False
+    grids: False
+    crop_size: 256
+    max_minibatch: 8
+    metrics:[
+      psnr:[
+        type: calculate_psnr
+        crop_border: 0
+        test_y_channel: True
+      ]
+    ]
+  ]
+  logger:[
+    print_freq: 100
+    save_checkpoint_freq: 500.0
+    use_tb_logger: True
+    wandb:[
+      project: None
+      resume_id: None
+    ]
+  ]
+  dist_params:[
+    backend: nccl
+    port: 29500
+  ]
+  is_train: True
+  dist: False
+  rank: 0
+  world_size: 1
+
+2025-04-04 12:40:34,908 INFO: Dataset PairedImageDataset - RAIN200H is created.
+2025-04-04 12:40:34,910 INFO: Training statistics:
+	Number of train images: 1254
+	Dataset enlarge ratio: 1
+	Batch size per gpu: 192
+	World size (gpu number): 1
+	Require iter number per epoch: 7
+	Total epochs: 1429; iters: 10000.
+2025-04-04 12:40:34,913 INFO: Dataset PairedImageDataset - RAIN200H is created.
+2025-04-04 12:40:34,913 INFO: Number of val images/folders in RAIN200H: 100
+2025-04-04 12:40:34,913 INFO: Set pretrain_network_g to /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET/experiments/RAIN200H-LPNet_pad_theory/models/net_g_5000.pth
+2025-04-04 12:40:34,934 INFO: Loading LPNet_pad_theory model from /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Deraining_LPNET/experiments/RAIN200H-LPNet_pad_theory/models/net_g_5000.pth.
+2025-04-04 12:40:35,013 INFO: Model [LPNetModel] is created.
+2025-04-04 12:40:35,025 INFO: Resuming training from epoch: 833, iter: 5000.
+2025-04-04 12:40:39,628 INFO: Start training from epoch: 833, iter: 5000
+2025-04-04 12:47:35,749 INFO: [RAIN2..][epoch:849, iter:   5,100, lr:(4.845e-04,4.850e-05,)] [eta: 5:40:07, time (data): 0.918 (0.030)] l0: 3.7148e-02 l1: 4.2446e-02 l2: 4.7576e-02 l3: 3.9634e-02 l4: 4.0073e-02 l3_ssim: 3.5043e-01 l4_ssim: 3.2296e-01 
+2025-04-04 12:47:59,013 INFO: Validation RAIN200H,		 # psnr: 21.2112
+2025-04-04 12:54:45,870 INFO: [RAIN2..][epoch:866, iter:   5,200, lr:(4.688e-04,4.693e-05,)] [eta: 5:38:34, time (data): 0.894 (0.009)] l0: 3.6185e-02 l1: 4.0888e-02 l2: 4.6005e-02 l3: 3.9669e-02 l4: 4.0813e-02 l3_ssim: 3.4346e-01 l4_ssim: 3.1100e-01 
+2025-04-04 12:54:59,240 INFO: Validation RAIN200H,		 # psnr: 22.0773
+2025-04-04 13:01:05,751 INFO: [RAIN2..][epoch:882, iter:   5,300, lr:(4.532e-04,4.536e-05,)] [eta: 5:20:13, time (data): 0.894 (0.009)] l0: 3.7884e-02 l1: 4.1342e-02 l2: 4.7042e-02 l3: 3.9651e-02 l4: 3.9720e-02 l3_ssim: 3.3410e-01 l4_ssim: 3.1439e-01 
+2025-04-04 13:01:19,948 INFO: Validation RAIN200H,		 # psnr: 21.4307
+2025-04-04 13:07:41,921 INFO: [RAIN2..][epoch:899, iter:   5,400, lr:(4.375e-04,4.381e-05,)] [eta: 5:10:58, time (data): 0.894 (0.009)] l0: 3.4442e-02 l1: 3.8933e-02 l2: 4.4017e-02 l3: 3.8978e-02 l4: 3.9177e-02 l3_ssim: 3.5684e-01 l4_ssim: 3.1325e-01 
+2025-04-04 13:07:53,523 INFO: Validation RAIN200H,		 # psnr: 21.7456
+2025-04-04 13:14:17,058 INFO: [RAIN2..][epoch:916, iter:   5,500, lr:(4.220e-04,4.225e-05,)] [eta: 5:02:37, time (data): 0.894 (0.009)] l0: 3.9248e-02 l1: 4.2660e-02 l2: 4.8161e-02 l3: 4.0602e-02 l4: 4.0934e-02 l3_ssim: 3.5529e-01 l4_ssim: 3.1726e-01 
+2025-04-04 13:14:17,058 INFO: Saving models and training states.
+2025-04-04 13:14:29,461 INFO: Validation RAIN200H,		 # psnr: 21.9120
+2025-04-04 13:20:30,938 INFO: [RAIN2..][epoch:932, iter:   5,600, lr:(4.065e-04,4.071e-05,)] [eta: 4:52:16, time (data): 0.894 (0.009)] l0: 3.6876e-02 l1: 3.9618e-02 l2: 4.5891e-02 l3: 3.9620e-02 l4: 4.0801e-02 l3_ssim: 3.3801e-01 l4_ssim: 3.1920e-01 
+2025-04-04 13:20:43,118 INFO: Validation RAIN200H,		 # psnr: 21.3317
+2025-04-04 13:27:00,159 INFO: [RAIN2..][epoch:949, iter:   5,700, lr:(3.911e-04,3.917e-05,)] [eta: 4:44:40, time (data): 0.894 (0.009)] l0: 3.7868e-02 l1: 4.1914e-02 l2: 4.6831e-02 l3: 4.0353e-02 l4: 3.9999e-02 l3_ssim: 3.5373e-01 l4_ssim: 3.2452e-01 
+2025-04-04 13:27:12,177 INFO: Validation RAIN200H,		 # psnr: 21.5926
+2025-04-04 13:33:33,673 INFO: [RAIN2..][epoch:966, iter:   5,800, lr:(3.759e-04,3.764e-05,)] [eta: 4:37:43, time (data): 0.895 (0.010)] l0: 3.9137e-02 l1: 4.2220e-02 l2: 4.7634e-02 l3: 3.9887e-02 l4: 4.1646e-02 l3_ssim: 3.5424e-01 l4_ssim: 3.1918e-01 
+2025-04-04 13:33:46,478 INFO: Validation RAIN200H,		 # psnr: 22.0169
+2025-04-04 13:39:48,909 INFO: [RAIN2..][epoch:982, iter:   5,900, lr:(3.607e-04,3.613e-05,)] [eta: 4:29:28, time (data): 0.894 (0.009)] l0: 3.9239e-02 l1: 4.2751e-02 l2: 4.8679e-02 l3: 3.8943e-02 l4: 4.0506e-02 l3_ssim: 3.4472e-01 l4_ssim: 3.2177e-01 
+2025-04-04 13:39:59,351 INFO: Validation RAIN200H,		 # psnr: 22.0304
+2025-04-04 13:46:11,817 INFO: [RAIN2..][epoch:999, iter:   6,000, lr:(3.457e-04,3.463e-05,)] [eta: 4:22:07, time (data): 0.894 (0.009)] l0: 3.6411e-02 l1: 4.0053e-02 l2: 4.5801e-02 l3: 3.9685e-02 l4: 3.9846e-02 l3_ssim: 3.4458e-01 l4_ssim: 3.1840e-01 
+2025-04-04 13:46:11,817 INFO: Saving models and training states.
+2025-04-04 13:46:23,976 INFO: Validation RAIN200H,		 # psnr: 22.3602
+2025-04-04 13:52:38,455 INFO: [RAIN2..][epoch:1016, iter:   6,100, lr:(3.308e-04,3.314e-05,)] [eta: 4:15:10, time (data): 0.894 (0.009)] l0: 3.7325e-02 l1: 4.1393e-02 l2: 4.6123e-02 l3: 3.9432e-02 l4: 3.9554e-02 l3_ssim: 3.3196e-01 l4_ssim: 3.1146e-01 
+2025-04-04 13:52:48,342 INFO: Validation RAIN200H,		 # psnr: 21.2172
+2025-04-04 13:58:46,854 INFO: [RAIN2..][epoch:1032, iter:   6,200, lr:(3.162e-04,3.168e-05,)] [eta: 4:07:21, time (data): 0.894 (0.009)] l0: 3.4987e-02 l1: 3.9323e-02 l2: 4.5229e-02 l3: 3.8106e-02 l4: 3.8841e-02 l3_ssim: 3.3397e-01 l4_ssim: 3.1376e-01 
+2025-04-04 13:58:56,823 INFO: Validation RAIN200H,		 # psnr: 21.9921
+2025-04-04 14:05:10,503 INFO: [RAIN2..][epoch:1049, iter:   6,300, lr:(3.016e-04,3.023e-05,)] [eta: 4:00:30, time (data): 0.894 (0.009)] l0: 3.8142e-02 l1: 4.1690e-02 l2: 4.6861e-02 l3: 3.9856e-02 l4: 3.9133e-02 l3_ssim: 3.4892e-01 l4_ssim: 3.0717e-01 
+2025-04-04 14:05:21,726 INFO: Validation RAIN200H,		 # psnr: 21.8298
+2025-04-04 14:11:36,921 INFO: [RAIN2..][epoch:1066, iter:   6,400, lr:(2.873e-04,2.880e-05,)] [eta: 3:53:50, time (data): 0.894 (0.009)] l0: 3.8742e-02 l1: 4.2865e-02 l2: 4.7973e-02 l3: 3.9830e-02 l4: 4.2030e-02 l3_ssim: 3.4202e-01 l4_ssim: 3.2402e-01 
+2025-04-04 14:11:49,093 INFO: Validation RAIN200H,		 # psnr: 21.7011
+2025-04-04 14:17:48,528 INFO: [RAIN2..][epoch:1082, iter:   6,500, lr:(2.732e-04,2.739e-05,)] [eta: 3:46:38, time (data): 0.894 (0.009)] l0: 3.5857e-02 l1: 4.0676e-02 l2: 4.5843e-02 l3: 3.8556e-02 l4: 3.9485e-02 l3_ssim: 3.3499e-01 l4_ssim: 3.1052e-01 
+2025-04-04 14:17:48,529 INFO: Saving models and training states.
+2025-04-04 14:17:59,197 INFO: Validation RAIN200H,		 # psnr: 21.1405

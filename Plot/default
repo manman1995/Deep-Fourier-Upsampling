@@ -1,0 +1,4 @@
+Pad_fusion Model: Max PSNR = 23.0356 at Epoch 1083
+Pad_larger_kernel Model: Max PSNR = 23.0152 at Epoch 1033
+Pad_theory Model: Max PSNR = 22.3602 at Epoch 999
+Pad Model: Max PSNR = 22.6593 at Epoch 872
