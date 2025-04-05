@@ -20,8 +20,7 @@ scancel <job ID>
 
 squeue -A eecs568s001w25_class
 
-[yiweigui@gl-login4 Plot]$ python parse_log_plot_psnr.py pad_fuse.log pad_larger_kernel.log pad_theory.log pad.log --labels "Pad_fusion Model" "Pad_larger_kernel Model" "Pad_theory Model" "Pad Model" --output psnr_plot.png --title "PSNR Comparison" --scale_flags 1 1 1 0.98 --psnr_info_output default
-
+[yiweigui@gl-login4 Plot]$ python parse_log_plot_psnr.py pad_attention.log pad_fusion_v1.log pad_fusion_v2.log pad_larger_kernel.log pad_theory.log pad.log --labels "pad_attention" "pad_fusion_v1" "pad_fusion_v2" "pad_larger_kernel" "pad_theory" "pad" --output psnr_plot.png --title "PSNR Comparison" --scale_flags 1 1 1 1 1 0.98 --psnr_info_output default
 
 如果实现不加入conv的周期填充？
 为什么要加入conv？

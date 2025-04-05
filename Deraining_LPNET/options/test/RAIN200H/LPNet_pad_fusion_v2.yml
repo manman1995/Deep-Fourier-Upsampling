@@ -1,0 +1,58 @@
+# ------------------------------------------------------------------------
+# Copyright (c) 2021 megvii-model. All Rights Reserved.
+# ------------------------------------------------------------------------
+# Modified from BasicSR (https://github.com/xinntao/BasicSR)
+# Copyright 2018-2020 BasicSR Authors
+# ------------------------------------------------------------------------
+# general settings
+name: RAIN200H-LPNet_pad_fusion
+model_type: LPNetModel
+scale: 1
+num_gpu: 1
+manual_seed: 10
+
+# dataset and data loader settings
+datasets:
+  test:
+    name: RAIN200H
+    type: PairedImageDataset
+    dataroot_gt: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Dataset/Rain100H/norain
+    dataroot_lq: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Dataset/Rain100H/rainy
+    io_backend:
+      type: disk
+
+# network structures
+network_g:
+  type: LPNet_combined_area_pad
+
+# path
+path:
+  pretrain_network_g: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/Deep-Fourier-Upsampling/Pretrained_model/pad_fusion_v2/net_g_4500.pth
+  strict_load_g: true
+  resume_state: ~
+
+# training settings
+# validation settings
+val:
+#  val_freq: 10
+#  val_freq: !!float 2.5e4
+  save_img: false
+  grids: false
+  crop_size: 256
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 0
+      test_y_channel: true
+    ssim:
+      type: calculate_ssim
+      crop_border: 0
+      test_y_channel: true
+
+# logging settings
+
+# dist training settings
+dist_params:
+  backend: nccl
+  port: 29500
