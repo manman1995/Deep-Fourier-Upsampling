@@ -1,31 +1,61 @@
 # LPNetDeraining
 
 ## 1. Introduction
-This folder contains the implementation of the LPNet model for image deraining using deep Fourier upsampling techniques. The project leverages Theorem-1 in Deep Fourier Upsampling,"periodic padding", to enhance image quality by effectively removing rain streaks from images.
+This folder contains the implementation of the **LPNet** model for image 
+deraining using deep Fourier upsampling techniques. The project leverages 
+Theorem-1 from *Deep Fourier Upsampling*, specifically **periodic padding**, 
+to enhance image quality by effectively removing rain streaks from images.
 
 ## 2. Training and Inference Commands
 ### Training
-To train the model, use the following commands:
+To train the model, ensure the following fields are correctly set in the config 
+(e.g., `pad_area.yml`):
+
+```yaml
+# Ground truth and input (rainy) image paths
+dataroot_gt: /home/haojd/Fourier/deraining/lpnet/datasets/RainTrainH/norain
+dataroot_lq: /home/haojd/Fourier/deraining/lpnet/datasets/RainTrainH/rain
+
+# Validation image path
+dataroot_gt: /home/haojd/Fourier/deraining/lpnet/datasets/Rain100H
+dataroot_lq: /home/haojd/Fourier/deraining/lpnet/datasets/Rain100H/rainy
+
+# Network architecture (must match the training config)
+network_g:
+  type: LPNet_combined_area_pad
+```
+
+Then run training with:
+
 ```bash
-python basicsr/train.py -opt options/train/pad.yml
 python basicsr/train.py -opt options/train/pad_area.yml
-python basicsr/train.py -opt options/train/pad_corner.yml
-python basicsr/train.py -opt options/train/pad_larger_kernel.yml
-python basicsr/train.py -opt options/train/pad_theory.yml
-python basicsr/train.py -opt options/train/pad_attention.yml
-
-
 ```
 
 ### Inference
-To test the model on a dataset, use:
+To test the model, ensure the following fields are correctly set in the config 
+(e.g., `pad_area.yml`):
+
+```yaml
+# Ground truth and input (rainy) image paths
+dataroot_gt: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/\
+Deep-Fourier-Upsampling/Dataset/Rain100H/norain
+dataroot_lq: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/yiweigui/\
+Deep-Fourier-Upsampling/Dataset/Rain100H/rainy
+
+# Pretrained model path
+path:
+  pretrain_network_g: /scratch/eecs568s001w25_class_root/eecs568s001w25_class/\
+yiweigui/Deep-Fourier-Upsampling/Pretrained_model/pad_fusion_v2/net_g_4500.pth
+
+# Network architecture (must match the training config)
+network_g:
+  type: LPNet_combined_area_pad
+```
+
+Then run inference with:
+
 ```bash
-python basicsr/train.py -opt options/test/pad.yml
-python basicsr/train.py -opt options/test/pad_area.yml
-python basicsr/train.py -opt options/test/pad_corner.yml
-python basicsr/train.py -opt options/test/pad_larger_kernel.yml
-python basicsr/train.py -opt options/test/pad_theory.yml
-python basicsr/train.py -opt options/test/pad_attention.yml
+python basicsr/test.py -opt options/test/pad_area.yml
 ```
 
 ## 3. Commonly Used Command-Line Instructions
@@ -42,4 +72,10 @@ python basicsr/train.py -opt options/test/pad_attention.yml
   ```bash
   scancel <job ID>
   ```
+
+## 4. Authors
+- Yiwei Gui
+- Jiadong Hao
+- Yiting Wang
+- Hefeng Zhou
 

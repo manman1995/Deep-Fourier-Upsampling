@@ -5,7 +5,7 @@
 # Copyright 2018-2020 BasicSR Authors
 # ------------------------------------------------------------------------
 # general settings
-name: RAIN200H-LPNet_pad_fusion
+name: RAIN200H-LPNet_pad_area
 model_type: LPNetModel
 scale: 1
 num_gpu: 1
