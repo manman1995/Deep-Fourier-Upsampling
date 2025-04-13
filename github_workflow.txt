@@ -10,7 +10,7 @@ ssh -T git@github.com # 测试登陆
 # 创建一个自己的分支
 git checkout main
 git pull origin main # 确保代码已经最新
-# ZZZZZZZZZZ
+
 # 创建并切换到你的分支
 git checkout -b yourbranchname #以后任何开发都在自己的branch上面
 把本地当前分支推送到远程仓库 origin 的 haojd 分支，并将它设置为“默认上游分支（upstream）”。
