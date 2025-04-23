@@ -189,8 +189,14 @@ The pre-trained models used in paper are saved in `PretrainedModel folder`. You 
 
 ## Results
 ### Training Results for Different Modified Fourier-up Variants
-![training results for different modified Fourier-up variants](Plot/psnr.png)
-### Quantitative Results on Rain200H
+![Training results for different modified Fourier-up variants](Plot/stage2train.jpg)
+### Quantitative Results on VOC2012_Aug
+| Upsample Methods                    | Data Set     | Overall Accuracy | Mean Accuracy | Mean IoU |
+|------------------------------------|--------------|------------------|----------------|----------|
+| Original                           | VOC2012_Aug  | 0.9113           | 0.8157         | 0.6775   |
+| **Fourier_pad**                    | VOC2012_Aug  | **0.9215**       | **0.8363**     | **0.7106** |
+| Fourier_pad_Attention + Fourier_pad| VOC2012_Aug  | 0.9202           | 0.8360         | 0.7047   |
+
 
 
 
