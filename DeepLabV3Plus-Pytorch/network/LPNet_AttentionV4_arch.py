@@ -1,19 +1,6 @@
-# ------------------------------------------------------------------------
-# Copyright (c) 2021 megvii-model. All Rights Reserved.
-# ------------------------------------------------------------------------
-'''
-derain_nips: Half Instance Normalization Network for Image Restoration
-
-@inproceedings{chen2021derain_nips,
-  title={derain_nips: Half Instance Normalization Network for Image Restoration},
-  author={Liangyu Chen and Xin Lu and Jie Zhang and Xiaojie Chu and Chengpeng Chen},
-  booktitle={IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops},
-  year={2021}
-}
-'''
-
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import numpy as np
 
 def pad(x, kernel_size=3, dilation=1):
@@ -62,23 +49,113 @@ def GaussianPyramid(img,kernel,n):
 
     return levels[::-1]
 
+# Simple Frequency Attention module - simpler than multihead
+# class SimpleFrequencyAttention(nn.Module):
+#     def __init__(self, channels, dropout=0.1):
+#         super(SimpleFrequencyAttention, self).__init__()
+        
+#         # Single projection for q/k/v (maintains channel count)
+#         self.to_qkv = nn.Conv2d(channels, channels * 3, kernel_size=1, bias=False)
+#         self.scale = channels ** -0.5
+        
+#         # Equivalent to the second 1×1 conv in the original implementation
+#         self.to_out = nn.Sequential(
+#             nn.Conv2d(channels, channels, kernel_size=1),
+#             nn.Dropout(dropout)
+#         )
+        
+#     def forward(self, x):
+#         b, c, h, w = x.shape
+        
+#         # Project to q, k, v (all with same channel count)
+#         qkv = self.to_qkv(x).chunk(3, dim=1)
+#         q, k, v = map(lambda t: t.reshape(b, c, h*w), qkv)
+        
+#         # Transpose q for matrix multiplication
+#         q = q.permute(0, 2, 1)  # [b, h*w, c]
+        
+#         # Compute attention
+#         attn = torch.bmm(q, k) * self.scale  # [b, h*w, h*w]
+#         attn = attn.softmax(dim=-1)
+        
+#         # Apply attention to values
+#         out = torch.bmm(attn, v.permute(0, 2, 1))  # [b, h*w, c]
+#         out = out.permute(0, 2, 1).reshape(b, c, h, w)  # [b, c, h, w]
+        
+#         # Final projection
+#         return self.to_out(out)
+class SimpleFrequencyAttention(nn.Module):
+    def __init__(self, channels, dropout=0.1, down_factor=4):
+        super(SimpleFrequencyAttention, self).__init__()
+        self.scale = channels ** -0.5
+        self.down_factor = down_factor
 
-# FourierUp 算法在这里实现
-class freup_pad(nn.Module):
-    def __init__(self, channels):
-        super(freup_pad, self).__init__()
+        self.q_conv = nn.Conv2d(channels, channels, kernel_size=1)
+        self.k_conv = nn.Conv2d(channels, channels, kernel_size=1)
+        self.v_conv = nn.Conv2d(channels, channels, kernel_size=1)
 
-        self.amp_fuse = nn.Sequential(nn.Conv2d(channels,channels,1,1,0),nn.LeakyReLU(0.1,inplace=False),
-                                      nn.Conv2d(channels,channels,1,1,0))
-        self.pha_fuse = nn.Sequential(nn.Conv2d(channels,channels,1,1,0),nn.LeakyReLU(0.1,inplace=False),
-                                      nn.Conv2d(channels,channels,1,1,0))
-
-        self.post = nn.Conv2d(channels,channels,1,1,0)
+        self.out_conv = nn.Sequential(
+            nn.Conv2d(channels, channels, kernel_size=1),
+            nn.Dropout(dropout)
+        )
 
     def forward(self, x):
+        B, C, H, W = x.shape
 
+        q = self.q_conv(x).view(B, C, -1).permute(0, 2, 1)  # [B, HW, C]
+
+        # Downsample for key/value
+        k = F.max_pool2d(self.k_conv(x), self.down_factor)
+        v = F.max_pool2d(self.v_conv(x), self.down_factor)
+
+        k_hw = k.shape[2] * k.shape[3]
+        k = k.view(B, C, k_hw)  # [B, C, HW']
+        v = v.view(B, C, k_hw).permute(0, 2, 1)  # [B, HW', C]
+
+        attn = torch.bmm(q, k) * self.scale  # [B, HW, HW']
+        attn = F.softmax(attn, dim=-1)
+        out = torch.bmm(attn, v)  # [B, HW, C]
+
+        out = out.permute(0, 2, 1).contiguous().view(B, C, H, W)
+        return self.out_conv(out)
+
+# Modified freup_pad with frequency domain simple self-attention
+class freup_pad_simple_attention_with_conv(nn.Module):
+    def __init__(self, channels, dropout=0.1, use_attention=False):
+        super(freup_pad_simple_attention_with_conv, self).__init__()
+        
+        # Flag to optionally disable attention
+        self.use_attention = use_attention
+
+        # Amplitude and phase processing using sequential 1x1 convs
+        self.amp_fuse = nn.Sequential(
+            nn.Conv2d(channels, channels, 1, 1, 0),
+            nn.LeakyReLU(0.1, inplace=False),
+            nn.Conv2d(channels, channels, 1, 1, 0)
+        )
+        self.pha_fuse = nn.Sequential(
+            nn.Conv2d(channels, channels, 1, 1, 0),
+            nn.LeakyReLU(0.1, inplace=False),
+            nn.Conv2d(channels, channels, 1, 1, 0)
+        )
+        
+        # Self-attention modules (only used when use_attention is True)
+        if use_attention:
+            # Replace multihead with simple attention
+            self.amp_attention = SimpleFrequencyAttention(channels, dropout)
+            self.pha_attention = SimpleFrequencyAttention(channels, dropout)
+            
+            # Feature fusion after attention
+            self.amp_post = nn.Conv2d(channels, channels, 1, 1, 0)
+            self.pha_post = nn.Conv2d(channels, channels, 1, 1, 0)
+        
+        # Final processing
+        self.post = nn.Conv2d(channels, channels, 1, 1, 0)
+
+    def forward(self, x):
         N, C, H, W = x.shape
 
+        # Convert to frequency domain
         fft_x = torch.fft.fft2(x)
         mag_x = torch.abs(fft_x)
         pha_x = torch.angle(fft_x)
@@ -86,53 +163,71 @@ class freup_pad(nn.Module):
         Mag = self.amp_fuse(mag_x)
         Pha = self.pha_fuse(pha_x)
 
-        amp_fuse = torch.tile(Mag, (2, 2))
-        pha_fuse = torch.tile(Pha, (2, 2))
+        # Different processing based on whether to use attention
+        if self.use_attention:
+            # Apply simple self-attention directly to raw frequency components
+            Mag_attn = self.amp_attention(mag_x)
+            Pha_attn = self.pha_attention(pha_x)
+            
+            # Post-process attended features with residual connection
+            Mag = self.amp_post(Mag_attn + mag_x)
+            Pha = self.pha_post(Pha_attn + pha_x)
+        # else:
+        #     # Use traditional sequential convs when not using attention
+        #     Mag = self.amp_fuse(mag_x)
+        #     Pha = self.pha_fuse(pha_x)
+        
+        # Repeat (tile) in whole block horizontally and vertically
+        # amp_fuse = torch.tile(Mag, (2, 2))
+        # pha_fuse = torch.tile(Pha, (2, 2))
+        amp_fuse = torch.tile(Mag, (1, 1, 2, 2)) / 4.0
+        pha_fuse = torch.tile(Pha, (1, 1, 2, 2))
 
+        # Convert back to spatial domain
         real = amp_fuse * torch.cos(pha_fuse)
         imag = amp_fuse * torch.sin(pha_fuse)
         out = torch.complex(real, imag)
-
+        
         output = torch.fft.ifft2(out)
         output = torch.abs(output)
 
         return self.post(output)
 
 
-######## Laplacian and Gaussian Pyramid ########
-class LPNet_pad(nn.Module):
+class LPNet_simple_attention_with_conv(nn.Module):
 
-    def __init__(self, in_chn=3, num_pyramids=5,num_blocks=5, num_feature=32,relu_slope=0.2):
-        super(LPNet_pad, self).__init__()
+    def __init__(self, in_chn=3, num_pyramids=5, num_blocks=5, num_feature=32, relu_slope=0.2):
+        super(LPNet_simple_attention_with_conv, self).__init__()
         self.num_pyramids = num_pyramids
         self.num_blocks = num_blocks
         self.num_feature = num_feature
         self.k = np.float32([.0625, .25, .375, .25, .0625])  # Gaussian kernel for image pyramid
-        self.k = np.outer( self.k,  self.k)
+        self.k = np.outer(self.k, self.k)
         self.kernel = self.k[None, None, :, :]
         # self.kernel = np.repeat(self.kernel, 3, axis=1)
         self.kernel = np.repeat(self.kernel, 3, axis=0)
         self.kernel = torch.tensor(self.kernel).cuda()
 
-
         self.subnet_0 = Subnet(num_feature=int((self.num_feature)/16), num_blocks=self.num_blocks)
         self.relu_0 = nn.LeakyReLU(0.2, inplace=False)
-        self.fup0 = freup_pad(3)
-        self.fuse_0 = nn.Conv2d(6,3,1,1,0)
+        self.fup0 = freup_pad_simple_attention_with_conv(3, dropout=0.3, use_attention=True)
+        self.fuse_0 = nn.Conv2d(6, 3, 1, 1, 0)  # in_channels=6, out_channels=3, kernel_size=1, stride=1, padding=0
 
         self.subnet_1 = Subnet(num_feature=int((self.num_feature) / 8), num_blocks=self.num_blocks)
         self.relu_1 = nn.LeakyReLU(0.2, inplace=False)
-        self.fup1 = freup_pad(3)
-        self.fuse_1 = nn.Conv2d(6,3,1,1,0)
+        self.fup1 = freup_pad_simple_attention_with_conv(3, dropout=0.3, use_attention=True)
+        self.fuse_1 = nn.Conv2d(6, 3, 1, 1, 0)
 
         self.subnet_2 = Subnet(num_feature=int((self.num_feature) / 4), num_blocks=self.num_blocks)
         self.relu_2 = nn.LeakyReLU(0.2, inplace=False)
-        self.fup2 = freup_pad(3)
-        self.fuse_2 = nn.Conv2d(6,3,1,1,0)
+        self.fup2 = freup_pad_simple_attention_with_conv(3, dropout=0.3, use_attention=True)
+        self.fuse_2 = nn.Conv2d(6, 3, 1, 1, 0)
+        
         self.subnet_3 = Subnet(num_feature=int((self.num_feature) / 2), num_blocks=self.num_blocks)
         self.relu_3 = nn.LeakyReLU(0.2, inplace=False)
-        self.fup3= freup_pad(3)
-        self.fuse_3 = nn.Conv2d(6,3,1,1,0)
+        self.fup3 = freup_pad_simple_attention_with_conv(3, dropout=0.3, use_attention=True)
+        self.fuse_3 = nn.Conv2d(6, 3, 1, 1, 0)
+        
         self.subnet_4 = Subnet(num_feature=int((self.num_feature) / 1), num_blocks=self.num_blocks)
         self.relu_4 = nn.LeakyReLU(0.2, inplace=False)
 
@@ -145,29 +240,32 @@ class LPNet_pad(nn.Module):
         # out_0_t = nn.functional.conv_transpose2d(out_0, self.kernel*4, bias=None, stride=2,groups=3) + self.fup0(out_0)
         out_0_t = nn.functional.conv_transpose2d(out_0, self.kernel * 4, bias=None, stride=2, groups=3)
         out_0_t = out_0_t[:, :, pad_beg_list[0]:-pad_end_list[0], pad_beg_list[0]:-pad_end_list[0]]
-        out_0_t = self.fuse_0(torch.concat([out_0_t,self.fup0(out_0)],1))
+        out_0_t = self.fuse_0(torch.concat([out_0_t, self.fup0(out_0)], 1))
 
         out_1 = self.subnet_1(pyramid[1])
         out_1 = out_1 + out_0_t
         out_1 = self.relu_1(out_1)
-        out_1_t = nn.functional.conv_transpose2d(out_1, self.kernel*4, bias=None, stride=2,groups=3)
+        out_1_t = nn.functional.conv_transpose2d(out_1, self.kernel*4, bias=None, stride=2, groups=3)
         out_1_t = out_1_t[:, :, pad_beg_list[1]:-pad_end_list[1], pad_beg_list[1]:-pad_end_list[1]]
         
-        out_1_t = self.fuse_1(torch.concat([out_1_t,self.fup1(out_1)],dim=1))
+        out_1_t = self.fuse_1(torch.concat([out_1_t, self.fup1(out_1)], dim=1))
 
         out_2 = self.subnet_2(pyramid[2])
         out_2 = out_2 + out_1_t
         out_2 = self.relu_2(out_2)
-        out_2_t = nn.functional.conv_transpose2d(out_2, self.kernel*4, bias=None, stride=2,groups=3)
+        out_2_t = nn.functional.conv_transpose2d(out_2, self.kernel*4, bias=None, stride=2, groups=3)
         out_2_t = out_2_t[:, :, pad_beg_list[2]:-pad_end_list[2], pad_beg_list[2]:-pad_end_list[2]]
-        out_2_t = self.fuse_2(torch.concat([out_2_t,self.fup2(out_2)],dim=1))
+        out_2_t = self.fuse_2(torch.concat([out_2_t, self.fup2(out_2)], dim=1))
 
         out_3 = self.subnet_3(pyramid[3])
         out_3 = out_3 + out_2_t
         out_3 = self.relu_3(out_3)
-        out_3_t = nn.functional.conv_transpose2d(out_3, self.kernel*4, bias=None, stride=2,groups=3)
+        out_3_t = nn.functional.conv_transpose2d(out_3, self.kernel*4, bias=None, stride=2, groups=3)  # normal spatial upsampling
         out_3_t = out_3_t[:, :, pad_beg_list[3]:-pad_end_list[3], pad_beg_list[3]:-pad_end_list[3]]
-        out_3_t = self.fuse_3(torch.concat([out_3_t,self.fup3(out_3)],dim=1))
+        
+        # Add frequency upsampling result
+        out_3_t = out_3_t + self.fup3(out_3)  # necessary
+        out_3_t = self.fuse_3(torch.concat([out_3_t, self.fup3(out_3)], dim=1))
 
         out_4 = self.subnet_4(pyramid[4])
         out_4 = out_4 + out_3_t
@@ -180,7 +278,6 @@ class LPNet_pad(nn.Module):
         outout_pyramid.append(out_3)
         outout_pyramid.append(out_4)
         return outout_pyramid
-
 
     def get_input_chn(self, in_chn):
         return in_chn
@@ -195,7 +292,7 @@ class LPNet_pad(nn.Module):
 
 
 class Subnet(nn.Module):
-    def __init__(self,num_feature, num_blocks):
+    def __init__(self, num_feature, num_blocks):
         super(Subnet, self).__init__()
         self.num_blocks = num_blocks
         self.conv_0 = nn.Conv2d(3, num_feature, kernel_size=3, padding=1, bias=True)
@@ -218,9 +315,9 @@ class Subnet(nn.Module):
 
         self.conv_6= nn.Conv2d(num_feature, num_feature, kernel_size=3, padding=1, bias=True)
         self.relu_6 = nn.LeakyReLU(0.2, inplace=False)
-        self.conv_7= nn.Conv2d(num_feature, num_feature, kernel_size=3,padding=1,  bias=True)
+        self.conv_7= nn.Conv2d(num_feature, num_feature, kernel_size=3, padding=1, bias=True)
         self.relu_7 = nn.LeakyReLU(0.2, inplace=False)
-        self.conv_8= nn.Conv2d(num_feature, 3, kernel_size=1,  bias=True)
+        self.conv_8= nn.Conv2d(num_feature, 3, kernel_size=1, bias=True)
 
 
     def forward(self, images):
@@ -228,7 +325,7 @@ class Subnet(nn.Module):
         out = self.relu_0(out)
 
         #  recursive blocks
-        for i  in range(self.num_blocks):
+        for i in range(self.num_blocks):
             out = self.conv_1(out)
             out = self.relu_1(out)
 
@@ -254,4 +351,4 @@ class Subnet(nn.Module):
         return out
 
 if __name__ == "__main__":
-    pass
+    pass 
