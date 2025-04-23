@@ -1,0 +1,6 @@
+pad_area: Max PSNR = 22.6009 at Epoch 849
+pad_attention: Max PSNR = 24.3137 at Epoch 738 it: 57600 57500.pth
+pad_corner: Max PSNR = 23.0356 at Epoch 1083
+pad_larger_kernel: Max PSNR = 23.0152 at Epoch 1033
+pad_theory: Max PSNR = 22.3602 at Epoch 999
+pad: Max PSNR = 23.1217 at Epoch 872

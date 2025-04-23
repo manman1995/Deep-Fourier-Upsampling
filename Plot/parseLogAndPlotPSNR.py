@@ -82,9 +82,9 @@ def plot_psnr(log_files, labels=None, output_path=None, title="PSNR vs Epochs", 
     plt.title(title, fontsize=16)
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.legend(loc='best')
-    plt.xlim(0, 925)
+    plt.xlim(0, 730)
 
-    plt.xticks(np.linspace(0, 925, 10, dtype=int), rotation=45)
+    plt.xticks(np.linspace(0, 730, 10, dtype=int), rotation=45)
 
     
     plt.tight_layout()
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     parser.add_argument('log_files', nargs='+', help='Paths to the log files')
     parser.add_argument('--labels', nargs='+', help='Labels for each log file')
     parser.add_argument('--output', help='Path to save the output plot')
-    parser.add_argument('--title', default='PSNR vs Epochs', help='Title for the plot')
+    parser.add_argument('--title', default='', help='Title for the plot')
     parser.add_argument('--scale_flags', nargs='+', type=float, help='Scaling factors for each log (e.g., 1.0 0.95)')
     parser.add_argument('--psnr_info_output', default='max_psnr_results.txt', help='Output file for max PSNR info')
 

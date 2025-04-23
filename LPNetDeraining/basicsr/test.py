@@ -15,7 +15,6 @@ from basicsr.utils import (get_env_info, get_root_logger, get_time_str,
                            make_exp_dirs)
 from basicsr.utils.options import dict2str
 
-
 def main():
     # parse options, set distributed setting, set ramdom seed
     opt = parse_options(is_train=False)
