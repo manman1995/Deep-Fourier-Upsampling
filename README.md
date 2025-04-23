@@ -96,7 +96,7 @@ The pre-trained models used in paper are saved in `PretrainedModel folder`. You 
 
 # Stage 2 Apply Fourier Up-sampling & self-attention in DeepLabV3Plus (Image Segementation)
 ## DeepLabV3Plus Structure
-![DeepLabV3Plus Structure](Plot/DeepLabV3Plus_Structure)
+![DeepLabV3Plus Structure](Plot/DeepLabV3Plus_Structure.jpg)
 ## Preparation 
 
 ### Environment
