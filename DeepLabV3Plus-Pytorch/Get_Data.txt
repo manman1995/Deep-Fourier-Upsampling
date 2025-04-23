@@ -26,3 +26,10 @@ wget https://raw.githubusercontent.com/meetshah1995/pytorch-semseg/master/datase
 
 echo "✅ 数据准备完成！目录结构如下："
 echo "~/deeplab_data/VOCdevkit/VOC2012/"
+
+#运行代码
+python main.py --model deeplabv3plus_mobilenet --gpu_id 0 --year 2012_aug --crop_val --lr 0.01 --crop_size 513 --batch_size 16 --output_stride 16
+python main.py --model deeplabv3plus_mobilenet --gpu_id 0 --year 2012_aug --crop_val --lr 0.01 --crop_size 513 --batch_size 16 --output_stride 16 --ckpt checkpoints/best_deeplabv3plus_mobilenet_voc_os16.pth --test_only --save_val_results
+
+#离线运行
+tmux new -s trainjob

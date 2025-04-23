@@ -3,6 +3,8 @@ from torch import nn
 from torch.nn import functional as F
 
 from .utils import _SimpleSegmentationModel
+from .utils import FourierUp 
+from .utils import FourierUpAtt 
 
 
 __all__ = ["DeepLabV3"]
@@ -35,6 +37,9 @@ class DeepLabHeadV3Plus(nn.Module):
         )
 
         self.aspp = ASPP(in_channels, aspp_dilate)
+        # # FourierUp and Fusion
+        self.fourier_up = FourierUp(256, scale_factor=2, dropout=0.1)
+        self.fuse_up = nn.Conv2d(512, 256, 1, bias=False)
 
         self.classifier = nn.Sequential(
             nn.Conv2d(304, 256, 3, padding=1, bias=False),
@@ -44,11 +49,26 @@ class DeepLabHeadV3Plus(nn.Module):
         )
         self._init_weight()
 
+# Upsampling1
     def forward(self, feature):
-        low_level_feature = self.project( feature['low_level'] )
-        output_feature = self.aspp(feature['out'])
-        output_feature = F.interpolate(output_feature, size=low_level_feature.shape[2:], mode='bilinear', align_corners=False)
-        return self.classifier( torch.cat( [ low_level_feature, output_feature ], dim=1 ) )
+        low_level_feature = self.project( feature['low_level'] )# 16, 48, 128, 128
+
+        
+        output_feature = self.aspp(feature['out'])# 16, 256, 32, 32
+
+        # Bilinear Up-Sampling
+        hi_bi = F.interpolate(output_feature, size=low_level_feature.shape[2:], mode='bilinear', align_corners=False)
+        #print(hi_bi.shape)
+        # return self.classifier( torch.cat( [ low_level_feature, hi_bi ], dim=1 ) )
+        
+        #Fourier-Up x4
+        hi_fu = self.fourier_up(output_feature, size=low_level_feature.shape[2:])
+        #print(hi_fu.shape)
+
+        #Fusion
+        hi_fused = self.fuse_up(torch.cat([hi_bi, hi_fu], dim=1))
+
+        return self.classifier( torch.cat( [ low_level_feature, hi_fused ], dim=1 ) )
     
     def _init_weight(self):
         for m in self.modules():

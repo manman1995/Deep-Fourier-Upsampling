@@ -3,19 +3,51 @@ import torch.nn as nn
 import numpy as np
 import torch.nn.functional as F
 from collections import OrderedDict
+from .LPNet_AttentionV4_arch import freup_pad_simple_attention_with_conv as FreAtt
 
+# Upsampling_Beginning  ######################################################
+# class _SimpleSegmentationModel(nn.Module):
+#     def __init__(self, backbone, classifier):
+#         super(_SimpleSegmentationModel, self).__init__()
+#         self.backbone = backbone
+#         self.classifier = classifier
+    
+#     def forward(self, x):
+#         input_shape = x.shape[-2:]
+#         features = self.backbone(x)
+#         x = self.classifier(features)
+#         x = F.interpolate(x, size=input_shape, mode='bilinear', align_corners=False)
+#         return x
+
+#Fourier UPAttention ######################################################
 class _SimpleSegmentationModel(nn.Module):
     def __init__(self, backbone, classifier):
-        super(_SimpleSegmentationModel, self).__init__()
-        self.backbone = backbone
+        super().__init__()
+        self.backbone   = backbone
         self.classifier = classifier
-        
+
+        out_ch = self.classifier.classifier[-1].out_channels
+        self.fourier_up_final = FourierUp(out_ch, scale_factor=2)
+        self.fuse_final = nn.Conv2d(out_ch * 2, out_ch, 1, bias=False)
+
     def forward(self, x):
-        input_shape = x.shape[-2:]
-        features = self.backbone(x)
-        x = self.classifier(features)
-        x = F.interpolate(x, size=input_shape, mode='bilinear', align_corners=False)
-        return x
+        in_size  = x.shape[-2:]
+        feats    = self.backbone(x)
+        logits_1_4 = self.classifier(feats)             # 1/4 尺度 (DeepLab 已经带有上一步融合)
+
+        # ─── 双线性恢复原尺寸 ───
+        
+        up_bi = F.interpolate(logits_1_4, size=in_size, mode="bilinear",
+                              align_corners=False)
+        
+        # ─── Fourier‑domain 4× 恢复原尺寸 ───
+        #up_fu = self.fourier_up_final(logits_1_4, size=in_size)
+        # Fourier Up attention
+        up_fu = self.fourier_up_final(logits_1_4, size = in_size)
+        # ─── 融合 ───
+        logits = self.fuse_final(torch.cat([up_bi, up_fu], dim=1))
+        # logits = up_bi
+        return logits
 
 
 class IntermediateLayerGetter(nn.ModuleDict):
@@ -91,3 +123,80 @@ class IntermediateLayerGetter(nn.ModuleDict):
                 else:
                     out[out_name] = x
         return out
+
+class freup_pad(nn.Module):
+    def __init__(self, channels):
+        super(freup_pad, self).__init__()
+
+        self.amp_fuse = nn.Sequential(nn.Conv2d(channels,channels,1,1,0),nn.LeakyReLU(0.1,inplace=False),
+                                      nn.Conv2d(channels,channels,1,1,0))
+        self.pha_fuse = nn.Sequential(nn.Conv2d(channels,channels,1,1,0),nn.LeakyReLU(0.1,inplace=False),
+                                      nn.Conv2d(channels,channels,1,1,0))
+
+        self.post = nn.Conv2d(channels,channels,1,1,0)
+
+    def forward(self, x):
+
+        N, C, H, W = x.shape
+
+        fft_x = torch.fft.fft2(x)
+        mag_x = torch.abs(fft_x)
+        pha_x = torch.angle(fft_x)
+
+        Mag = self.amp_fuse(mag_x)
+        Pha = self.pha_fuse(pha_x)
+
+        amp_fuse = torch.tile(Mag, (2, 2))
+        pha_fuse = torch.tile(Pha, (2, 2))
+
+        real = amp_fuse * torch.cos(pha_fuse)
+        imag = amp_fuse * torch.sin(pha_fuse)
+        out = torch.complex(real, imag)
+
+        output = torch.fft.ifft2(out)
+        output = torch.abs(output)
+
+        return self.post(output)
+
+
+class FourierUp(nn.Module):
+    def __init__(self, channels: int, scale_factor: int = 2):
+        super().__init__()
+        assert scale_factor in {2, 4, 8, 16}, "倍率必须是 2,4,8,16 等 2^k"
+        self.n_repeat = int(np.log2(scale_factor))
+        # 复用同一个 freup_pad 权重，节省显存
+        self.fourier2x = freup_pad(channels)
+        self.fourier4x = freup_pad(channels)
+
+    def forward(self, x: torch.Tensor, size=None) -> torch.Tensor:
+        y = x
+        #for _ in range(self.n_repeat):
+        y = self.fourier2x(y)
+        #for _ in range(self.n_repeat):
+        y = self.fourier4x(y)
+        # 如果最终与目标尺寸稍有出入，做一次最邻近 resize 兜底
+        if size is not None and y.shape[-2:] != size:
+            y = F.interpolate(y, size=size, mode="nearest")
+        return y
+
+class FourierUpAtt(nn.Module):
+    """
+    Fourier 上采样 (2^k 倍) + 频域简单自注意力
+    """
+    def __init__(self, channels: int, scale_factor: int = 2,
+                 dropout: float = 0.1):
+        super().__init__()
+        assert scale_factor in {2, 4, 8, 16}, "倍率必须是 2^k"
+        self.n_repeat = int(np.log2(scale_factor))
+        # 复用同一个带注意力的 freup_pad，节省显存
+        self.fourier2x = FreAtt(channels, dropout=dropout, use_attention=True)
+        self.fourier4x = FreAtt(channels, dropout=dropout, use_attention=False)
+
+    def forward(self, x: torch.Tensor, size=None) -> torch.Tensor:
+        y = x
+        # for _ in range(self.n_repeat):
+        y = self.fourier2x(y)          
+        y = self.fourier4x(y)
+        if size is not None and y.shape[-2:] != size:     # 尺寸兜底
+            y = F.interpolate(y, size=size, mode="nearest")
+        return y

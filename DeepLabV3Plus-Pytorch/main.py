@@ -46,7 +46,7 @@ def get_argparser():
     parser.add_argument("--test_only", action='store_true', default=False)
     parser.add_argument("--save_val_results", action='store_true', default=False,
                         help="save segmentation results to \"./results\"")
-    parser.add_argument("--total_itrs", type=int, default=30e3,
+    parser.add_argument("--total_itrs", type=int, default=30000,
                         help="epoch number (default: 30k)")
     parser.add_argument("--lr", type=float, default=0.01,
                         help="learning rate (default: 0.01)")
@@ -316,7 +316,12 @@ def main():
         model.eval()
         val_score, ret_samples = validate(
             opts=opts, model=model, loader=val_loader, device=device, metrics=metrics, ret_samples_ids=vis_sample_id)
-        print(metrics.to_str(val_score))
+        log_str = metrics.to_str(val_score)
+        print(log_str)
+
+        with open("train_log.txt", "a") as f:  # 追加写入
+            f.write("Epoch: %d, Itrs: %d\n" % (cur_epochs, cur_itrs))
+            f.write(log_str + "\n\n")
         return
 
     interval_loss = 0
@@ -345,7 +350,9 @@ def main():
                 interval_loss = interval_loss / 10
                 print("Epoch %d, Itrs %d/%d, Loss=%f" %
                       (cur_epochs, cur_itrs, opts.total_itrs, interval_loss))
-                interval_loss = 0.0
+                with open("train_log.txt", "a") as f:
+                    f.write("Epoch %d, Itrs %d/%d, Loss=%.6f\n" %
+                            (cur_epochs, cur_itrs, opts.total_itrs, interval_loss))
 
             if (cur_itrs) % opts.val_interval == 0:
                 save_ckpt('checkpoints/latest_%s_%s_os%d.pth' %
@@ -355,7 +362,12 @@ def main():
                 val_score, ret_samples = validate(
                     opts=opts, model=model, loader=val_loader, device=device, metrics=metrics,
                     ret_samples_ids=vis_sample_id)
-                print(metrics.to_str(val_score))
+                log_str = metrics.to_str(val_score)
+                print(log_str)
+
+                with open("train_log.txt", "a") as f:  # 追加写入
+                    f.write("Epoch: %d, Itrs: %d\n" % (cur_epochs, cur_itrs))
+                    f.write(log_str + "\n\n")
                 if val_score['Mean IoU'] > best_score:  # save best model
                     best_score = val_score['Mean IoU']
                     save_ckpt('checkpoints/best_%s_%s_os%d.pth' %
