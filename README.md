@@ -94,7 +94,9 @@ The pre-trained models used in paper are saved in `PretrainedModel folder`. You 
 
 
 
-#Stage 2 Apply Fourier Up-sampling & self-attention in DeepLabV3Plus (Image Segementation)
+# Stage 2 Apply Fourier Up-sampling & self-attention in DeepLabV3Plus (Image Segementation)
+## DeepLabV3Plus Structure
+![DeepLabV3Plus Structure](Plot/DeepLabV3Plus_Structure)
 ## Preparation 
 
 ### Environment
@@ -189,7 +191,7 @@ The pre-trained models used in paper are saved in `PretrainedModel folder`. You 
 
 ## Results
 ### Training Results for Different Modified Fourier-up Variants
-![Training results for different modified Fourier-up variants](Plot/stage2train.jpg)
+![Training results for different modified Fourier-up variants](Plot/stage2Train.jpg)
 ### Quantitative Results on VOC2012_Aug
 | Upsample Methods                    | Data Set     | Overall Accuracy | Mean Accuracy | Mean IoU |
 |------------------------------------|--------------|------------------|----------------|----------|
