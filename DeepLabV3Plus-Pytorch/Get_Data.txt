@@ -1,0 +1,35 @@
+# 1. 创建数据文件夹
+mkdir -p DeepLabV3Plus-Pytorch/datasets/data/VOCdevkit
+cd DeepLabV3Plus-Pytorch/datasets/data/VOCdevkit
+
+# 2. 下载 Pascal VOC 2012 官方数据集
+echo "📥 Downloading Pascal VOC 2012..."
+wget http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar
+tar -xvf VOCtrainval_11-May-2012.tar
+rm VOCtrainval_11-May-2012.tar
+
+# 3. 下载增强标注（来自 Dropbox 备份）
+echo "📥 Downloading VOC Augmented Annotations (SegmentationClassAug)..."
+wget https://www.dropbox.com/sh/oeu149j8qtbsu4s/AACyqg6XWqU5s8PpZ9e1KxgRa/VOC_Aug.tar?dl=1 -O VOC_Aug.tar
+tar -xvf VOC_Aug.tar
+rm VOC_Aug.tar
+
+# 4. 移动增强标注到正确目录
+mv VOC_Aug/SegmentationClassAug VOC2012/
+rm -r VOC_Aug
+
+# 5. 确保有 ImageSets 文件（你也可以用 repo 中的）
+mkdir -p VOC2012/ImageSets/Segmentation
+cd VOC2012/ImageSets/Segmentation
+# 如果没有train_aug.txt，可以从网上下载
+wget https://raw.githubusercontent.com/meetshah1995/pytorch-semseg/master/datasets/voc/train_aug.txt
+
+echo "✅ 数据准备完成！目录结构如下："
+echo "~/deeplab_data/VOCdevkit/VOC2012/"
+
+#运行代码
+python main.py --model deeplabv3plus_mobilenet --gpu_id 0 --year 2012_aug --crop_val --lr 0.01 --crop_size 513 --batch_size 16 --output_stride 16
+python main.py --model deeplabv3plus_mobilenet --gpu_id 0 --year 2012_aug --crop_val --lr 0.01 --crop_size 513 --batch_size 16 --output_stride 16 --ckpt checkpoints/best_deeplabv3plus_mobilenet_voc_os16.pth --test_only --save_val_results
+
+#离线运行
+tmux new -s trainjob

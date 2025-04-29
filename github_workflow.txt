@@ -1,0 +1,36 @@
+git clone ggit@github.com:Verbsius/EECS556_25WN.git # ssh connection， ssh verification
+cd project
+
+#ssh 验证
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+cat ~/.ssh/id_rsa.pub # 查看公钥
+# 进入 GitHub → Settings → SSH and GPG Keys → New SSH Key
+ssh -T git@github.com # 测试登陆
+
+# 创建一个自己的分支
+git checkout main
+git pull origin main # 确保代码已经最新
+
+# 创建并切换到你的分支
+git checkout -b yourbranchname #以后任何开发都在自己的branch上面
+把本地当前分支推送到远程仓库 origin 的 haojd 分支，并将它设置为“默认上游分支（upstream）”。
+git push -u origin haojd
+
+
+#提交pr去更新main branch
+# 查看更改
+git status
+# 添加并提交
+git add . #可以在.gitignore 里面specify 那些不用上传
+git commit -m "Add feature xxx"
+# 推送到远程你自己的仓库
+git push origin yourname
+
+然后就能在github pull request了，然后需要手动合并一下，解决一下冲突，注意不要pull 到别人上面去了
+
+#如何更新自己的分支到main
+git checkout main
+git pull origin main
+git checkout yourname
+git merge main # 解决冲突
+
