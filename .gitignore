@@ -1,0 +1,14 @@
+Dataset/
+Linux_Code.txt
+__pycache__
+VOCdevkit
+checkpoints
+.vscode
+*.pyc
+.idea/
+__pycache__
+results
+checkpoints_bak
+cityscapes
+test_results
+train_log.txt
