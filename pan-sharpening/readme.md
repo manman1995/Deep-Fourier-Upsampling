@@ -13,7 +13,6 @@ Before using the code, make sure to configure the following parameters in the co
 Download the pre-trained models and checkpoints from this [Google Drive link](https://drive.google.com/drive/folders/1zayArqjtukQu9HmtkWQlGzynRNRi-idt?usp=sharing
 ) and place them in the appropriate directories.
 
-
 # Usage
 Inference
 For inference, after configuring the parameters, run the following commands:
