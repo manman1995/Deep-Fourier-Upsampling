@@ -1,5 +1,5 @@
 ## Applications
-###  Image deraining
+###  Image deraining 
 ####  Prepare data
 Download the training data and add the data path to the config file (/basicsr/option/train/RAIN200H(L)/*.yml). 
 #### : Training
