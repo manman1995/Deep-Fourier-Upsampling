@@ -9,6 +9,7 @@ import glob
 import h5py
 import sys
 import os
+
 from PIL import Image
 sys.path.append('..')
 from skimage.transform import rescale
